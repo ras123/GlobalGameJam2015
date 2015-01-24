@@ -66,6 +66,7 @@ class PlayState extends FlxState
 			return;
 		}
 		
+		/*
 		var asteroidSize = 12;
 		
 		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
@@ -87,8 +88,11 @@ class PlayState extends FlxState
 		
 		// Now give it some horizontal speed.
 		asteroid.velocity.y = maxAsteroidSpeed * (FlxRandom.float() - 0.5);
+		*/
 		
+		var asteroid:Asteroid = new Asteroid();
 		
 		asteroids.add(asteroid);
+		
 	}
 }

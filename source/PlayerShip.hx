@@ -21,7 +21,7 @@ class PlayerShip extends FlxSprite
 	{
 		super(X, Y);
 		
-		loadGraphic("assets/images/testship.png");
+		loadGraphic("assets/images/shipsprite.png");
 		maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
 		drag.x = maxVelocity.x * SHIP_DECELLERATION_RATE.x;
 	}
