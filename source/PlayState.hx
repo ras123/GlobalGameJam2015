@@ -16,18 +16,11 @@ import openfl._v2.geom.Point;
  * A FlxState which can be used for the actual gameplay.
  */
 class PlayState extends FlxState
-{
-	private static var PLAYER_ONE_CONTROLS : Array<String> = ["A", "SPACE"];
-	private static var PLAYER_TWO_CONTROLS : Array<String> = ["D", "L"];
-	
-	private static var SHIP_MAX_VELOCITY : FlxPoint = new FlxPoint(256, 512);
-	private static var SHIP_ACCELERATION_RATE : FlxPoint = new FlxPoint(8, 8);
-	private static var SHIP_DECELLERATION_RATE : FlxPoint = new FlxPoint(2, 2);
-	
-	private var playerShip:FlxSprite;
+{	
+	private var playerShip:PlayerShip;
 	
 	private var asteroids:FlxGroup;
-
+	
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -37,10 +30,8 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
-		playerShip = new FlxSprite(FlxG.width / 2, FlxG.height / 2);
-		playerShip.makeGraphic(24, 24, FlxColor.WHITE);
-		playerShip.maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
-		playerShip.drag.x = playerShip.maxVelocity.x * SHIP_DECELLERATION_RATE.x;
+		//playerShip = new FlxSprite(FlxG.width / 2, FlxG.height / 2);
+		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
 		add(playerShip);
 		
 		asteroids = new FlxGroup();
@@ -61,32 +52,6 @@ class PlayState extends FlxState
 	 */
 	override public function update():Void
 	{
-		
-		var playerOneButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
-		var playerTwoButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
-		
-		// Four states. Each one is a permutation of whether player 1 and 2 have
-		// their button pressed.
-		if (playerOneButtonIsPressed && playerTwoButtonIsPressed) {
-			playerShip.acceleration.y = -playerShip.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
-			playerShip.acceleration.x = 0;
-		}
-		else if (playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
-			playerShip.acceleration.y = playerShip.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
-			playerShip.acceleration.x = -playerShip.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-		}
-		else if (!playerOneButtonIsPressed && playerTwoButtonIsPressed) {
-			playerShip.acceleration.y = playerShip.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
-			playerShip.acceleration.x = playerShip.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-		}
-		else if (!playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
-			playerShip.acceleration.y = playerShip.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
-			playerShip.acceleration.x = 0;
-		}
-		else {
-			// Should never happen.
-		}
-		
 		super.update();
 		
 		spawnAsteroids();
