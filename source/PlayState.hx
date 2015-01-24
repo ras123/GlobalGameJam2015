@@ -27,7 +27,7 @@ class PlayState extends FlxState
 	private var playerShip:FlxSprite;
 	
 	private var asteroids:FlxGroup;
-	
+
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
