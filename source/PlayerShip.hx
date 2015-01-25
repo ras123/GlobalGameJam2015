@@ -15,7 +15,7 @@ class PlayerShip extends FlxSprite
 	public static var PLAYER_SPRITE_HEIGHT: Int = 100;
 	
 	private static var PLAYER_ONE_CONTROLS: Array<String> = ["ENTER"];//, "A", "SPACE"];
-	private static var PLAYER_TWO_CONTROLS: Array<String> = ["CAPSLOCK"];//, "D", "L"];
+	private static var PLAYER_TWO_CONTROLS: Array<String> = ["CAPSLOCK", "SHIFT"];//, "D", "L"];
 	//private static var DOWN_CONTROLS: Array<String> = ["S"];
 
 	private static var r_booster_acc: FlxPoint = new FlxPoint(-5, 7);
@@ -56,16 +56,18 @@ class PlayerShip extends FlxSprite
 	}
 	
 	public function addCaptains(captainOne:FlxSprite, captainTwo:FlxSprite):Void {
+		var frameRate:Int = 12;
+		
 		this.captainOne = captainOne;
 		captainOne.loadGraphic("assets/images/captsheet.png", true, 250, 300);
-		captainOne.animation.add("idle", [0, 1], 4, true);
-		captainOne.animation.add("active", [2, 3], 4, true);
+		captainOne.animation.add("idle", [0, 1], frameRate, true);
+		captainOne.animation.add("active", [2, 3], frameRate, true);
 		captainOne.scrollFactor.set(0, 0);
 		
 		this.captainTwo = captainTwo;
 		captainTwo.loadGraphic("assets/images/captsheet.png", true, 250, 300);
-		captainTwo.animation.add("idle", [4, 5], 4, true);
-		captainTwo.animation.add("active", [6, 7], 4, true);
+		captainTwo.animation.add("idle", [4, 5], frameRate, true);
+		captainTwo.animation.add("active", [6, 7], frameRate, true);
 		captainTwo.scrollFactor.set(0, 0);
 	}
 	

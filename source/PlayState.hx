@@ -56,7 +56,7 @@ class PlayState extends FlxState
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
 	
-	private static var deathCamFrames = 30;
+	private static var deathCamFrames = 10;
 	private var deathZoomInRate:Float = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 	private var deathCamDelta:FlxPoint;
 
@@ -222,10 +222,10 @@ class PlayState extends FlxState
 			
 			// Dramatic zoom!
 			if (FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
-				//FlxG.camera.zoom += deathZoomInRate;				
+				FlxG.camera.zoom += deathZoomInRate;				
 			
-				//FlxG.camera.x += deathCamDelta.x;
-				//FlxG.camera.y += deathCamDelta.y;
+				FlxG.camera.x += deathCamDelta.x;
+				FlxG.camera.y += deathCamDelta.y;
 			}
 		}
 	}
@@ -307,7 +307,11 @@ class PlayState extends FlxState
 	}
 	
 	private function updateHeightCounter():Void {
-		heightMeter.text = "Height: " + Std.int(FlxG.worldBounds.bottom - min_y) + "m";
+		// I just sloppily copy pasted this from above where the ship gets 
+		// created, and then tweaked it to fit a little better.
+		var initialShipPosY:Float = FlxG.worldBounds.bottom - (16 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT;
+		var maxShipHeight:Float = Math.max(0, initialShipPosY - min_y);
+		heightMeter.text = "Height: " + Std.int(maxShipHeight) + "m";
 	}
 	
 	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
@@ -330,8 +334,8 @@ class PlayState extends FlxState
 		
 		// Calculate death camera movement specs.
 		deathCamDelta = new FlxPoint();
-		deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
-		deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
+		deathCamDelta.x = (FlxG.camera.scroll.x - shipMidpoint.x) / deathCamFrames;
+		deathCamDelta.y = (FlxG.camera.scroll.y - shipMidpoint.y) / deathCamFrames;
 	}
 
 	private function dockTheShip(ship:FlxSprite, object:FlxSprite):Void {
@@ -348,7 +352,7 @@ class PlayState extends FlxState
 
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 200; // Chance per frame.
+		var asteroidSpawnRate:Float = 1 / 10; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
