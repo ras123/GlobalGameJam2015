@@ -38,6 +38,10 @@ class PlayState extends FlxState
 	private var debugtext1:FlxText;
 	private var debugtext2:FlxText;
 	
+	private var heightMeter:FlxText;
+	private var maxHeightAchieved:Float = 0;
+	private var startPositionY:Float = FlxG.height - 300;
+	
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -49,7 +53,7 @@ class PlayState extends FlxState
 		setupBackground();
 		add(background);
 		
-		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
+		playerShip = new PlayerShip(FlxG.width / 2, startPositionY);
 		add(playerShip);
 		min_y = playerShip.y;
 		
@@ -65,13 +69,18 @@ class PlayState extends FlxState
 		climbcamera_on = true;
 		
 		//createBlackHole();
-
+		
+		heightMeter = new FlxText(60, 60, 200, "Height: 0m");
+		heightMeter.size = 20;
+		heightMeter.scrollFactor.x = heightMeter.scrollFactor.y = 0;
+		add(heightMeter);
+		
 		debugtext1 = new FlxText(0, 0, 400, "player pos: " + playerShip.x + ", " + playerShip.y);
 		debugtext1.scrollFactor.set(0, 0);
 		debugtext2 = new FlxText(0, 12, 400, "screen pos: " + FlxG.camera.scroll.x + ", " + FlxG.camera.scroll.y);
 		debugtext2.scrollFactor.set(0, 0);
-		add(debugtext1);
-		add(debugtext2);
+		//add(debugtext1);
+		//add(debugtext2);
 		
 		super.create();
 	}
@@ -104,6 +113,9 @@ class PlayState extends FlxState
 			
 			i++;
 		}
+		
+		// Also update the world boundary for proper collision.
+		FlxG.worldBounds.set(0, -FlxG.height * i, FlxG.width, FlxG.height * (i+1));
 	}
 	
 	/**
@@ -131,6 +143,8 @@ class PlayState extends FlxState
 		
 		FlxG.overlap(playerShip, asteroids, doPrecisionOverlap);
 		
+		updateHeightCounter();
+		
 		if (!playerShip.alive) {
 			// Allow players to restart the game or go back to the menu.
 			if (FlxG.keys.anyPressed(["SPACE", "R"])) {
@@ -142,14 +156,22 @@ class PlayState extends FlxState
 			
 			// Dramatic zoom!
 			if (FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
-				FlxG.camera.zoom += deathZoomInRate;				
+				//FlxG.camera.zoom += deathZoomInRate;				
 			
-				FlxG.camera.x += deathCamDelta.x;
-				FlxG.camera.y += deathCamDelta.y;
+				//FlxG.camera.x += deathCamDelta.x;
+				//FlxG.camera.y += deathCamDelta.y;
 			}
-			
+		}
+	}
+	
+	private function updateHeightCounter():Void {
+		var currentHeight = Std.int(Math.abs(playerShip.y - startPositionY));
+		
+		if (currentHeight > maxHeightAchieved) {
+			maxHeightAchieved = currentHeight;
 		}
 		
+		heightMeter.text = "Height: " + maxHeightAchieved + "m";
 	}
 
 	private function manageCamera(climbing: Bool):Void
