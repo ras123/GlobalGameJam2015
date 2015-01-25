@@ -69,8 +69,8 @@ enum Size {
 		var center_pos = new FlxPoint(this.x + this.frameWidth / 2, this.y + this.frameHeight / 2);
 		
 		var obj_center_pos:FlxPoint = new FlxPoint(object.x + object.frameWidth/2, object.y + object.frameHeight/2);
-		var angle_between:Float = FlxAngle.getAngle(center_pos, obj_center_pos);
-		var distance_between:Float = FlxMath.getDistance(center_pos, obj_center_pos);
+		var angle_between:Float = FlxAngle.getAngle(obj_center_pos, center_pos);
+		var distance_between:Float = FlxMath.getDistance(obj_center_pos, center_pos);
 		
 		var acceleration:FlxPoint = FlxAngle.rotatePoint(0, attraction * Math.pow(1/distance_between, 2), 0, 0, angle_between);
 		object.velocity.add(acceleration.x, acceleration.y);

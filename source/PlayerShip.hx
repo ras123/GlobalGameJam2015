@@ -42,7 +42,7 @@ class PlayerShip extends FlxSprite
 		drag = new FlxPoint(100, 400);
 		maxAngular = 90;
 		angularDrag = 90;
-		acceleration = new FlxPoint(0, 250);
+		acceleration = new FlxPoint(0, 10);
 		
 		//maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
 		//drag.set(SHIP_DECELLERATION_RATE.x, SHIP_DECELLERATION_RATE.y);
