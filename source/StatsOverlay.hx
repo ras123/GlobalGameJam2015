@@ -14,7 +14,7 @@ class StatsOverlay extends FlxGroup
 {	
 	private static var BANNER_HEIGHT:Int = 300;
 	
-	private static var ANIMATION_DURATION:Float = 60; // Frames
+	private static var ANIMATION_DURATION:Float = 40; // Frames
 	
 	private static var bannerStartX:Float;
 	private static var bannerStartY:Float;
