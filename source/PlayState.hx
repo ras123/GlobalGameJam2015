@@ -78,7 +78,7 @@ class PlayState extends FlxState
 		add(background);
 		
 		playerShip = new PlayerShip(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - (PlayerShip.PLAYER_SPRITE_WIDTH/2),
-									FlxG.worldBounds.height - (12 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT);
+									FlxG.worldBounds.bottom - (12 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT);
 		add(playerShip);
 		min_y = playerShip.y;
 
@@ -251,7 +251,7 @@ class PlayState extends FlxState
 		if (BG_VERTICAL_TILES > 12)
 			FlxG.worldDivisions = Std.int(BG_VERTICAL_TILES/2);
 		// Update camera boundaries
-		FlxG.camera.setBounds(0, 0, HUD_HORIZONTAL_OFFSET * 2 + BGTILE_HORIZONTAL_LENGTHS, HUD_VERTICAL_OFFSET * 2 + BGTILE_VERTICAL_LENGTHS * BG_VERTICAL_TILES);
+		FlxG.camera.setBounds(0, 0, HUD_HORIZONTAL_OFFSET * 3 + BGTILE_HORIZONTAL_LENGTHS, HUD_VERTICAL_OFFSET * 3 + BGTILE_VERTICAL_LENGTHS * BG_VERTICAL_TILES);
 	}
 	
 	private function manageCamera(climbing: Bool):Void
