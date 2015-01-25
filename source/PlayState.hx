@@ -305,7 +305,11 @@ class PlayState extends FlxState
 	}
 	
 	private function updateHeightCounter():Void {
-		heightMeter.text = "Height: " + Std.int(FlxG.worldBounds.bottom - min_y) + "m";
+		// I just sloppily copy pasted this from above where the ship gets 
+		// created, and then tweaked it to fit a little better.
+		var initialShipPosY:Float = FlxG.worldBounds.bottom - (16 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT;
+		var maxShipHeight:Float = Math.max(0, initialShipPosY - min_y);
+		heightMeter.text = "Height: " + Std.int(maxShipHeight) + "m";
 	}
 	
 	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
