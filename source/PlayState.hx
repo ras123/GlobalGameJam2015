@@ -229,7 +229,7 @@ class PlayState extends FlxState
 		
 		//spawnAsteroids();
 		
-		spawnMines();
+		//spawnMines();
 		
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
@@ -383,6 +383,7 @@ class PlayState extends FlxState
 		var shipMidpoint:FlxPoint = ship.getMidpoint();
 		var explosion:Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
 		add(explosion);
+		FlxG.sound.play("assets/sounds/explosion.wav");
 		
 		playerShip.kill();
 		FlxG.camera.shake(0.01, 0.5);
