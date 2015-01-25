@@ -10,7 +10,7 @@ import flixel.util.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
-import openfl._v2.geom.Point;
+import flixel.util.FlxSpriteUtil;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -18,7 +18,6 @@ import openfl._v2.geom.Point;
 class PlayState extends FlxState
 {	
 	private var playerShip:PlayerShip;
-	
 	private var asteroids:FlxGroup;
 	
 	/**
@@ -30,12 +29,13 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
-		//playerShip = new FlxSprite(FlxG.width / 2, FlxG.height / 2);
 		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
 		add(playerShip);
 		
 		asteroids = new FlxGroup();
 		add(asteroids);
+		
+		//createBlackHole();
 	}
 	
 	/**
@@ -56,43 +56,53 @@ class PlayState extends FlxState
 		
 		spawnAsteroids();
 		
-		FlxG.collide(playerShip, asteroids);
+		if (FlxG.overlap(playerShip, asteroids)) {
+			var shipMidpoint : FlxPoint = playerShip.getMidpoint();
+			var explosion : Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
+			add(explosion);
+			
+			playerShip.kill();
+			
+		}
+		
+		if (!playerShip.alive) {
+			// Allow players to restart the game or go back to the menu.
+			if (FlxG.keys.anyPressed(["SPACE", "R"])) {
+				FlxG.cameras.fade(0xff000000, 1, false, restartGame);
+			}
+			else if (FlxG.keys.anyPressed(["ESCAPE", "M"])) {
+				FlxG.cameras.fade(0xff000000, 1, false, goToMainMenu);
+			}
+		}
+		
+		//FlxG.collide(playerShip, asteroids);
+	}
+	
+	private function restartGame():Void {
+		FlxG.switchState(new PlayState());
+	}
+	
+	private function goToMainMenu():Void {
+		FlxG.switchState(new MenuState());
 	}
 	
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 20;
+		var asteroidSpawnRate:Float = 1 / 40; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
-		
-		/*
-		var asteroidSize = 12;
-		
-		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
-		var spawnPosX:Int = spawnOnLeft ? 0 : FlxG.width - asteroidSize;
-		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height);
-		var asteroid:Asteroid = new Asteroid(spawnPosX, spawnPosY);
-		asteroid.makeGraphic(asteroidSize, asteroidSize, FlxColor.RED);
-		
-		// Give it some speed.
-		var minAsteroidSpeed = 100;
-		var maxAsteroidSpeed = 200;
-		asteroid.velocity.x = (maxAsteroidSpeed - minAsteroidSpeed) * 
-			FlxRandom.float() + minAsteroidSpeed;
-		
-		// Reverse speed if it's starting on the right side of the screen.
-		if (!spawnOnLeft) {
-			asteroid.velocity.x *= -1;
-		}
-		
-		// Now give it some horizontal speed.
-		asteroid.velocity.y = maxAsteroidSpeed * (FlxRandom.float() - 0.5);
-		*/
 		
 		var asteroid:Asteroid = new Asteroid();
 		
 		asteroids.add(asteroid);
 		
+	}
+	
+	public function createBlackHole():Void {
+		var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
+		blackHole.makeGraphic(48, 48, FlxColor.RED);
+		playerShip.setBlackHole(blackHole);
+		add(blackHole);
 	}
 }

@@ -3,6 +3,9 @@ package ;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxRandom;
+import flixel.util.FlxAngle;
+
+import Math;
 
 /**
  * ...
@@ -24,11 +27,13 @@ class Asteroid extends FlxSprite
 		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height);
 		super(spawnPosX, spawnPosY);
 		
-		loadGraphic("assets/images/asteroid1.png");
+		// Three asteroid graphics. Load randomly.
+		var asteroidNumber = FlxRandom.intRanged(1, 3);
+		loadGraphic("assets/images/asteroid" + asteroidNumber + ".png");
+		
 		
 		// Give it some speed.
-		this.velocity.x = (MAX_SPEED - MIN_SPEED) * 
-			FlxRandom.float() + MIN_SPEED;
+		this.velocity.x = (MAX_SPEED - MIN_SPEED) * FlxRandom.float() + MIN_SPEED;
 		
 		// Reverse speed if it's starting on the right side of the screen.
 		if (!spawnOnLeft) {
@@ -40,6 +45,19 @@ class Asteroid extends FlxSprite
 		
 		// Rotation rate.
 		rotationRate = MAX_ROTATION_RATE * (FlxRandom.float() - 0.5);
+		
+		// Asteroid 2 graphic doesn't look good rotating (kinda looks like a 
+		// commet). Remove the rotation, and make sure the orientation is set
+		// properly.
+		if (asteroidNumber == 2) {
+			rotationRate = 0;
+			// To get the asteroid flying straight calculate the initial angle 
+			// based on the velocities. 
+			this.angle = 45 + FlxAngle.TO_DEG * Math.tan(velocity.y / velocity.x);
+			if (spawnOnLeft) {
+				this.angle += 180;
+			}
+		}
 	}
 	
 	override public function update():Void {
