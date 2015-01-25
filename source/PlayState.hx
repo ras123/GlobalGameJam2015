@@ -54,7 +54,7 @@ class PlayState extends FlxState
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
 	
-	private static var deathCamFrames = 30;
+	private static var deathCamFrames = 10;
 	private var deathZoomInRate:Float = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 	private var deathCamDelta:FlxPoint;
 
@@ -220,10 +220,10 @@ class PlayState extends FlxState
 			
 			// Dramatic zoom!
 			if (FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
-				//FlxG.camera.zoom += deathZoomInRate;				
+				FlxG.camera.zoom += deathZoomInRate;				
 			
-				//FlxG.camera.x += deathCamDelta.x;
-				//FlxG.camera.y += deathCamDelta.y;
+				FlxG.camera.x += deathCamDelta.x;
+				FlxG.camera.y += deathCamDelta.y;
 			}
 		}
 	}
@@ -332,8 +332,8 @@ class PlayState extends FlxState
 		
 		// Calculate death camera movement specs.
 		deathCamDelta = new FlxPoint();
-		deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
-		deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
+		deathCamDelta.x = (FlxG.camera.scroll.x - shipMidpoint.x) / deathCamFrames;
+		deathCamDelta.y = (FlxG.camera.scroll.y - shipMidpoint.y) / deathCamFrames;
 	}
 	
 	private function restartGame():Void {
