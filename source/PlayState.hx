@@ -135,7 +135,9 @@ class PlayState extends FlxState
 		
 		blackholes = new FlxGroup();
 		blackholecores = new FlxGroup();
+		spawnBlackHoles(blackholes, blackholecores);
 		hazards.add(blackholecores);
+
 		add(hazards);
 		
 		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
@@ -143,9 +145,7 @@ class PlayState extends FlxState
 		//FlxG.camera.deadzone.bottom = FlxG.height;
 		//climbonly_deadzone = FlxG.camera.deadzone;
 		//climbcamera_on = true;
-		
-		//createBlackHole();
-		
+			
 		createCaptains();
 		
 		
@@ -359,14 +359,27 @@ class PlayState extends FlxState
 		
 	}
 
-	public function createBlackHole():Void {
-		var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
-		blackHole.makeGraphic(48, 48, FlxColor.RED);
-		playerShip.setBlackHole(blackHole);
-		add(blackHole);
-	}
+	//public function createBlackHole():Void {
+		//var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
+		//blackHole.makeGraphic(48, 48, FlxColor.RED);
+		//playerShip.setBlackHole(blackHole);
+		//add(blackHole);
+	//}
 
-	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void {
+	private function spawnBlackHoles(bh_group:FlxGroup, bhc_group:FlxGroup):Void
+	{
+		var blackhole_m = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 5, BGTILE_VERTICAL_LENGTHS * 7, Size.Medium);
+		bh_group.add(blackhole_m);
+
+		var blackhole_s = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 9, BGTILE_VERTICAL_LENGTHS * 11, Size.Small);
+		bh_group.add(blackhole_s);
+		
+		var blackhole_b = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 13, BGTILE_VERTICAL_LENGTHS * 15, Size.Big);
+		bh_group.add(blackhole_b);
+	}
+	
+	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void
+	{
 		if (Std.is(blackhole, BlackHole))
 			cast (blackhole, BlackHole).attract(ship);
 	}
