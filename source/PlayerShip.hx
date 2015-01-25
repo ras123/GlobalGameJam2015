@@ -37,7 +37,7 @@ class PlayerShip extends FlxSprite
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
 		super(X, Y);
-
+		
 		maxVelocity = new FlxPoint(500, 2000);
 		drag = new FlxPoint(100, 400);
 		maxAngular = 90;
@@ -82,18 +82,21 @@ class PlayerShip extends FlxSprite
 		{
 			velocity.addPoint(FlxAngle.rotatePoint(0, r_booster_acc.y + l_booster_acc.y, 0, 0, angle));
 			this.animation.play("f_booster");
+			FlxG.sound.play("assets/sounds/booster.wav");
 		}
 		else if (r_booster_on)
 		{
 			angularVelocity += r_booster_angular_acc;
 			velocity.addPoint(FlxAngle.rotatePoint(r_booster_acc.x, r_booster_acc.y, 0, 0, angle));
 			this.animation.play("r_booster");
+			FlxG.sound.play("assets/sounds/booster.wav");
 		}
 		else if (l_booster_on)
 		{
 			angularVelocity += l_booster_angular_acc;
 			velocity.addPoint(FlxAngle.rotatePoint(l_booster_acc.x, l_booster_acc.y, 0, 0, angle));
 			this.animation.play("l_booster");
+			FlxG.sound.play("assets/sounds/booster.wav");
 		}
 		else
 			this.animation.play("idle");
@@ -114,33 +117,33 @@ class PlayerShip extends FlxSprite
 			captainTwo.animation.play("idle");
 		}
 		
-		//this.acceleration.set(0, 0);
-		//// Four states. Each one is a permutation of whether player 1 and 2 have
-		//// their button pressed.
-		//if (r_booster_on && l_booster_on) {
-			//this.acceleration.y = -this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
-			//this.animation.play("f_booster");
-		//}
-		//else if (!r_booster_on && l_booster_on) {
-			//this.acceleration.x = -this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-			//this.animation.play("r_booster");
-		//}
-		//else if (r_booster_on && !l_booster_on) {
-			//this.acceleration.x = this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-			//this.animation.play("l_booster");
-		//}
-		//else if (FlxG.keys.anyPressed(["S"])) {
-			//this.acceleration.y = this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
-			//this.animation.play("idle");
-		//}
-		//else if (!r_booster_on && !l_booster_on) {
-			////this.acceleration.y = this.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
-			////this.acceleration.x = 0;
-			//this.animation.play("idle");
-		//}
-		//else {
+		/*this.acceleration.set(0, 0);
+		// Four states. Each one is a permutation of whether player 1 and 2 have
+		// their button pressed.
+		if (r_booster_on && l_booster_on) {
+			this.acceleration.y = -100;
+			this.animation.play("f_booster");
+		}
+		else if (!r_booster_on && l_booster_on) {
+			this.acceleration.x = -100;
+			this.animation.play("r_booster");
+		}
+		else if (r_booster_on && !l_booster_on) {
+			this.acceleration.x = 100;
+			this.animation.play("l_booster");
+		}
+		else if (FlxG.keys.anyPressed(["S"])) {
+			this.acceleration.y = 100;
+			this.animation.play("idle");
+		}
+		else if (!r_booster_on && !l_booster_on) {
+			//this.acceleration.y = this.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
+			//this.acceleration.x = 0;
+			this.animation.play("idle");
+		}
+		else {
 			//// Should never happen.
-		//}
+		}*/
 		
 		if (blackHoleVisible) {
 			var x = blackHole.getMidpoint().x - getMidpoint().x;
