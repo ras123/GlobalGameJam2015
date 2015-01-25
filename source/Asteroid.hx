@@ -65,8 +65,10 @@ class Asteroid extends FlxSprite
 	}
 	
 	override public function update():Void {
-		super.update();
+		if (x > PlayState.BGTILE_HORIZONTAL_LENGTHS || x < 0) 
+			kill();
 		
 		this.angle += rotationRate;
+		super.update();		
 	}
 }
