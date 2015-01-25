@@ -430,7 +430,7 @@ class PlayState extends FlxState
 
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 0 / 40; // Chance per frame.
+		var asteroidSpawnRate:Float = 1 / 60; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
@@ -442,7 +442,7 @@ class PlayState extends FlxState
 	}
 	
 	public function spawnMines():Void {
-		var mineSpawnRate:Float = 1 / 800; // Chance per frame.
+		var mineSpawnRate:Float = 1 / 20; // Chance per frame.
 		if (FlxRandom.float() > mineSpawnRate) {
 			return;
 		}

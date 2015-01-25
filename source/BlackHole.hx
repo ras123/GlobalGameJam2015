@@ -29,7 +29,7 @@ enum Size {
 	public function new(map_width:Int, min_y:Int, max_y:Int, size:EnumValue):Void
 	//public function new(x:Int, y:Int, size:EnumValue):Void
 	{
-		var spawn_x = Std.int(map_width * FlxRandom.floatRanged(0.3, 0.7));
+		var spawn_x = Std.int(map_width * FlxRandom.floatRanged(0.25, 0.75));
 		var spawn_y = FlxRandom.intRanged(min_y, max_y);		
 		super(spawn_x, spawn_y);
 		//super(x, y);
