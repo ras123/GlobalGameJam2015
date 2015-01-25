@@ -31,7 +31,7 @@ class StatsOverlay extends FlxGroup
 	private var animationCounter:Int = 0;
 	private var blinkCounter:Int = 0;
 	
-	public function new(maxHeight:Int) 
+	public function new(maxHeight:Int, isVictory:Bool) 
 	{
 		super();
 		
@@ -42,12 +42,20 @@ class StatsOverlay extends FlxGroup
 		
 		background = new FlxSprite(bannerStartX, bannerStartY);
 		background.scrollFactor.set(0, 0);
-		background.makeGraphic(FlxG.width, BANNER_HEIGHT, 0xaa00CC00);
+		if (isVictory) {
+			background.makeGraphic(FlxG.width, BANNER_HEIGHT, 0xaa00CC00);
+		}
+		else {
+			background.makeGraphic(FlxG.width, BANNER_HEIGHT, 0xaaFF0000);
+		}
 		add(background);
 		
 		heightTextStartX = FlxG.width;
 		heightTextTargetX = 0;
 		heightText = new FlxText(heightTextStartX, bannerStartY + 100, FlxG.width, maxHeight + " m", 60);
+		if (isVictory) {
+			heightText.text = "VICTORY!";
+		}
 		heightText.alignment = "center";
 		heightText.scrollFactor.set(0, 0);
 		add(heightText);

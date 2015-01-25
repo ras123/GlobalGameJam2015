@@ -38,7 +38,7 @@ class PlayState extends FlxState
 	private var boundaries: FlxGroup;
 	private var safespots: FlxGroup;
 	private var launchpad: FlxSprite;
-	private var target: FlxSprite;
+	private var targetArea: FlxSprite;
 	private var playerShip: PlayerShip;
 
 	private var hazards: FlxGroup;
@@ -136,13 +136,13 @@ class PlayState extends FlxState
 		launchpad.immovable = true;
 		safespots.add(launchpad);
 		
-		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top);
-		target.loadGraphic("assets/images/100spritesheet.png", false, 100, 100);
-		target.animation.add("idle", [44], 12, true);
-		target.animation.play("idle");
+		targetArea = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top);
+		targetArea.loadGraphic("assets/images/100spritesheet.png", false, 100, 100);
+		targetArea.animation.add("idle", [44], 12, true);
+		targetArea.animation.play("idle");
 		//target.makeGraphic(160, 24, FlxColor.SILVER);
-		target.immovable = true;
-		safespots.add(target);
+		targetArea.immovable = true;
+		safespots.add(targetArea);
 		add(safespots);
 		
 		hazards = new FlxGroup();
@@ -207,7 +207,7 @@ class PlayState extends FlxState
 		add(captainOne);
 		add(captainTwo);
 	}
-	
+
 	/**
 	 * Function that is called once every frame.
 	 */
@@ -235,6 +235,7 @@ class PlayState extends FlxState
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
 		FlxG.overlap(playerShip, mines, activateMine);
 		FlxG.overlap(playerShip, blackholes, activateGravity);
+		FlxG.collide(playerShip, targetArea, displayVictoryScreen);
 		FlxG.collide(playerShip, safespots, dockTheShip);
 		
 		updateHeightCounter();
@@ -259,7 +260,7 @@ class PlayState extends FlxState
 				// the zoom.
 				if (FlxG.camera.zoom >= CAMERA_MAX_ZOOM) {
 					deathCamZoomComplete = true;
-					statsOverlay = new StatsOverlay(getMaxHeight());
+					statsOverlay = new StatsOverlay(getMaxHeight(), false);
 					add(statsOverlay);
 				}
 			}
@@ -294,6 +295,13 @@ class PlayState extends FlxState
 			}
 		}
 	}
+	
+	private function displayVictoryScreen(sprite1:FlxSprite, sprite2:FlxSprite):Void {
+		//playerShip.destroy();
+		statsOverlay = new StatsOverlay(getMaxHeight(), true);
+		add(statsOverlay);
+	}
+	
 	
 	/**
 	 * Function that is called when this state is destroyed - you might want to 
