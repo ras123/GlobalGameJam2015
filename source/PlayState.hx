@@ -11,6 +11,7 @@ import flixel.util.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
+import flixel.util.FlxRect;
 import flixel.util.FlxSpriteUtil;
 
 /**
@@ -18,43 +19,61 @@ import flixel.util.FlxSpriteUtil;
  */
 class PlayState extends FlxState
 {	
+	private var background:FlxGroup;	
+
 	private var playerShip:PlayerShip;
 	private var asteroids:FlxGroup;
-	
-	private var background:FlxGroup;	
-	
+		
+	private var climbcamera_on:Bool;
+	private var min_y:Float;
+	private var climbonly_deadzone:FlxRect;
+
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
 	
 	private var deathCamFrames = 30;
 	private var deathZoomInRate:Float;
 	private var deathCamDelta:FlxPoint;
+
+	private var debugtext1:FlxText;
+	private var debugtext2:FlxText;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		super.create();
-		
 		FlxG.mouse.visible = false;
 		
 		background = new FlxGroup();
 		setupBackground();
 		add(background);
 		
-		deathZoomInRate = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
-		
 		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
 		add(playerShip);
+		min_y = playerShip.y;
+		
+		deathZoomInRate = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 		
 		asteroids = new FlxGroup();
 		add(asteroids);
 		
-		// Temp camera setup.
-		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN, 1);
+		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
+		FlxG.camera.deadzone.top = FlxG.height / 2;
+		FlxG.camera.deadzone.bottom = FlxG.height;
+		climbonly_deadzone = FlxG.camera.deadzone;
+		climbcamera_on = true;
 		
 		//createBlackHole();
+
+		debugtext1 = new FlxText(0, 0, 400, "player pos: " + playerShip.x + ", " + playerShip.y);
+		debugtext1.scrollFactor.set(0, 0);
+		debugtext2 = new FlxText(0, 12, 400, "screen pos: " + FlxG.camera.scroll.x + ", " + FlxG.camera.scroll.y);
+		debugtext2.scrollFactor.set(0, 0);
+		add(debugtext1);
+		add(debugtext2);
+		
+		super.create();
 	}
 	
 	private function setupBackground():Void {
@@ -102,6 +121,11 @@ class PlayState extends FlxState
 	override public function update():Void
 	{
 		super.update();
+
+		debugtext1.text = Std.string("player pos: " + playerShip.x + ", " + playerShip.y);
+		debugtext2.text = Std.string("screen pos: " + FlxG.camera.scroll.x + ", " + FlxG.camera.scroll.y);
+		
+		manageCamera(playerShip.accelerating);
 		
 		spawnAsteroids();
 		
@@ -126,6 +150,38 @@ class PlayState extends FlxState
 			
 		}
 		
+	}
+
+	private function manageCamera(climbing: Bool):Void
+	{		
+		// update min_y
+		if (climbcamera_on && playerShip.y < min_y)
+			min_y = playerShip.y;
+		
+		// reenable camera follow if playerShip reaches threshhold
+		if (climbing && playerShip.y < min_y && !climbcamera_on)
+		{
+			FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
+			FlxG.camera.deadzone = climbonly_deadzone;
+			climbcamera_on = true;
+		}
+				
+		// disable camera follow if playerShip falls off screen bottom
+		if (!climbing && climbcamera_on && playerShip.y > min_y + (FlxG.height / 2 - playerShip.frameHeight))
+		{
+			FlxG.camera.follow(null);
+			climbcamera_on = false;
+		}
+
+		// update horizontal camera position manually if follow disabled
+		if (!climbcamera_on)
+		{
+			if (playerShip.x - FlxG.camera.scroll.x < climbonly_deadzone.left)
+				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - climbonly_deadzone.left;
+			else if (playerShip.x - FlxG.camera.scroll.x > (climbonly_deadzone.right - playerShip.frameWidth/2))
+				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - (climbonly_deadzone.right - playerShip.frameWidth/2);
+		}
+
 	}
 	
 	private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
@@ -155,7 +211,7 @@ class PlayState extends FlxState
 	private function goToMainMenu():Void {
 		FlxG.switchState(new MenuState());
 	}
-	
+
 	public function spawnAsteroids():Void {
 		
 		var asteroidSpawnRate:Float = 1 / 40; // Chance per frame.
@@ -168,7 +224,7 @@ class PlayState extends FlxState
 		asteroids.add(asteroid);
 		
 	}
-	
+
 	public function createBlackHole():Void {
 		var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
 		blackHole.makeGraphic(48, 48, FlxColor.RED);

@@ -10,8 +10,8 @@ import flixel.util.FlxPoint;
  */
 class PlayerShip extends FlxSprite
 {
-	private static var PLAYER_ONE_CONTROLS : Array<String> = ["A", "SPACE"];
-	private static var PLAYER_TWO_CONTROLS : Array<String> = ["D", "L"];
+	private static var PLAYER_ONE_CONTROLS : Array<String> = ["ENTER", "A", "SPACE"];
+	private static var PLAYER_TWO_CONTROLS : Array<String> = ["CAPSLOCK", "D", "L"];
 	private static var DOWN_CONTROLS : Array<String> = ["S"];
 	
 	private static var SHIP_MAX_VELOCITY : FlxPoint = new FlxPoint(150, 150);
@@ -22,6 +22,7 @@ class PlayerShip extends FlxSprite
 	private var blackHole : FlxSprite;
 	private var blackHoleVisible : Bool = false;
 	
+	public var accelerating : Bool;
 	
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
@@ -36,6 +37,8 @@ class PlayerShip extends FlxSprite
 		this.animation.add("boost_right", [7, 8], 8, true);
 		this.animation.add("breaking_apart", [10, 11], 1, false);
 		this.animation.add("boost_forward", [12, 13], 8, true);
+
+		accelerating = false;
 	}
 	
 	override public function update():Void
@@ -44,6 +47,9 @@ class PlayerShip extends FlxSprite
 		
 		var playerOneButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
 		var playerTwoButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
+
+		if (playerOneButtonIsPressed || playerTwoButtonIsPressed)
+			accelerating = true;
 		
 		this.acceleration.set(0, 0);
 		// Four states. Each one is a permutation of whether player 1 and 2 have
