@@ -26,7 +26,7 @@ class PlayState extends FlxState
 	public static var HUD_VERTICAL_OFFSET: Int = 96;
 	public static var BGTILE_HORIZONTAL_LENGTHS: Int = 1920;
 	public static var BGTILE_VERTICAL_LENGTHS: Int = 960;
-	public static var BG_VERTICAL_TILES: Int = 16;
+	public static var BG_VERTICAL_TILES: Int = 1;
 	
 	private var captainOne:FlxSprite;
 	private var captainTwo:FlxSprite;
@@ -90,7 +90,7 @@ class PlayState extends FlxState
 
 		boundaries = new FlxGroup();
 		var floor = new FlxSprite(FlxG.worldBounds.left, FlxG.worldBounds.bottom - 100);
-		floor.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.BROWN);
+		floor.loadGraphic("assets/images/ground.png", false, 1920, 50);
 		floor.allowCollisions = FlxObject.CEILING;
 		boundaries.add(floor);
 
@@ -113,7 +113,8 @@ class PlayState extends FlxState
 		boundaries.add(r_wall2);
 		
 		var ceiling = new FlxSprite(FlxG.worldBounds.left, FlxG.worldBounds.top);
-		ceiling.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.CHARCOAL);
+		//ceiling.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.CHARCOAL);
+		ceiling.loadGraphic("assets/images/ceiling.png", false, 1920, 50);
 		ceiling.allowCollisions = FlxObject.FLOOR;
 		boundaries.add(ceiling);
 		add(boundaries);
@@ -126,12 +127,18 @@ class PlayState extends FlxState
 		
 		safespots = new FlxGroup();
 		launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
-		launchpad.makeGraphic(120, 16, 0xcc44ff00);
+		launchpad.loadGraphic("assets/images/100spritesheet.png", false, 100, 50);
+		launchpad.animation.add("idle", [96], 12, true);
+		launchpad.animation.play("idle");
+		//launchpad.makeGraphic(120, 16, 0xcc44ff00);
 		launchpad.immovable = true;
 		safespots.add(launchpad);
 		
-		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
-		target.makeGraphic(160, 24, FlxColor.SILVER);
+		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top);
+		target.loadGraphic("assets/images/100spritesheet.png", false, 100, 100);
+		target.animation.add("idle", [44], 12, true);
+		target.animation.play("idle");
+		//target.makeGraphic(160, 24, FlxColor.SILVER);
 		target.immovable = true;
 		safespots.add(target);
 		add(safespots);
@@ -359,12 +366,6 @@ class PlayState extends FlxState
 	private function updateHeightCounter():Void {
 		heightMeter.text = "Height: " + getMaxHeight() + "m";
 	}
-	
-	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
-		//if (FlxG.pixelPerfectOverlap(sprite1, sprite2)) {
-			//destroyTheShip();
-		//}
-	//}
 
 	private function processPreciseOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Bool {
 		return FlxG.pixelPerfectOverlap(sprite1, sprite2);
