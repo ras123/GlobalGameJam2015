@@ -22,6 +22,7 @@ class PlayerShip extends FlxSprite
 	private var blackHole : FlxSprite;
 	private var blackHoleVisible : Bool = false;
 	
+	public var accelerating : Bool;
 	
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
@@ -35,6 +36,8 @@ class PlayerShip extends FlxSprite
 		this.animation.add("boost_left", [5, 6], 8, true);
 		this.animation.add("boost_right", [7, 8], 8, true);
 		this.animation.add("breaking_up", [10, 11], 1, false);		
+		
+		accelerating = false;
 	}
 	
 	override public function update():Void
@@ -43,6 +46,9 @@ class PlayerShip extends FlxSprite
 		
 		var playerOneButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
 		var playerTwoButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
+
+		if (playerOneButtonIsPressed || playerTwoButtonIsPressed)
+			accelerating = true;
 		
 		this.acceleration.set(0, 0);
 		// Four states. Each one is a permutation of whether player 1 and 2 have
