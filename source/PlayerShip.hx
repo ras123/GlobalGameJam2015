@@ -18,9 +18,9 @@ class PlayerShip extends FlxSprite
 	private static var PLAYER_TWO_CONTROLS: Array<String> = ["CAPSLOCK"];//, "D", "L"];
 	//private static var DOWN_CONTROLS: Array<String> = ["S"];
 
-	private static var r_booster_acc: FlxPoint = new FlxPoint(-4, 6);
+	private static var r_booster_acc: FlxPoint = new FlxPoint(-5, 7);
 	private static var r_booster_angular_acc: Int = -45;
-	private static var l_booster_acc: FlxPoint = new FlxPoint(4, 6);
+	private static var l_booster_acc: FlxPoint = new FlxPoint(5, 7);
 	private static var l_booster_angular_acc: Int = 45;
 	
 	//private static var SHIP_MAX_VELOCITY: FlxPoint = new FlxPoint(150, 150);
@@ -38,7 +38,7 @@ class PlayerShip extends FlxSprite
 	{
 		super(X, Y);
 
-		maxVelocity = new FlxPoint(200, 2000);
+		maxVelocity = new FlxPoint(500, 2000);
 		drag = new FlxPoint(100, 400);
 		maxAngular = 90;
 		angularDrag = 90;
