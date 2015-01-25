@@ -56,12 +56,14 @@ enum Size {
 		}
 		
 		this.animation.add("idle", [0, 1], 8, true);
+		animation.play("idle");
 	}
 
 	override public function update():Void
 	{
 		super.update();
-		animation.play("idle");
+		
+		this.angle += 1;
 	}
 	
 	public function attract(object:FlxSprite):Void

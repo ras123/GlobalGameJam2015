@@ -27,7 +27,7 @@ class PlayState extends FlxState
 	public static var HUD_VERTICAL_OFFSET: Int = 96;
 	public static var BGTILE_HORIZONTAL_LENGTHS: Int = 1920;
 	public static var BGTILE_VERTICAL_LENGTHS: Int = 960;
-	public static var BG_VERTICAL_TILES: Int = 1;
+	public static var BG_VERTICAL_TILES: Int = 16;
 	
 	private var captainOne:FlxSprite;
 	private var captainTwo:FlxSprite;
