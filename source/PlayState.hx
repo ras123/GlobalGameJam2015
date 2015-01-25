@@ -3,6 +3,7 @@ package;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.FlxCamera;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
@@ -20,6 +21,8 @@ class PlayState extends FlxState
 	private var playerShip:PlayerShip;
 	private var asteroids:FlxGroup;
 	
+	private var background:FlxGroup;	
+	
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
 	
@@ -36,6 +39,10 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
+		background = new FlxGroup();
+		setupBackground();
+		add(background);
+		
 		deathZoomInRate = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 		
 		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
@@ -44,7 +51,40 @@ class PlayState extends FlxState
 		asteroids = new FlxGroup();
 		add(asteroids);
 		
+		// Temp camera setup.
+		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN, 1);
+		
 		//createBlackHole();
+	}
+	
+	private function setupBackground():Void {
+		var numBackgrounds:Int = 12;
+		
+		// Far away stars.
+		var i:Int = 0;
+		while (i < numBackgrounds) {
+			var backgroundTile:FlxSprite;
+			
+			// Far away stars.
+			backgroundTile = new FlxSprite(0, -FlxG.height * i);
+			backgroundTile.loadGraphic("assets/images/stars_20px.png", false, FlxG.width, FlxG.height);
+			backgroundTile.scrollFactor.y = 0.4;
+			background.add(backgroundTile);
+			
+			// Medium-distance stars.
+			backgroundTile = new FlxSprite(0, -FlxG.height * i);
+			backgroundTile.loadGraphic("assets/images/stars_32px.png", false, FlxG.width, FlxG.height);
+			backgroundTile.scrollFactor.y = 0.6;
+			background.add(backgroundTile);
+			
+			// Closer (bigger) stars.
+			backgroundTile = new FlxSprite(0, -FlxG.height * i);
+			backgroundTile.loadGraphic("assets/images/stars_64px.png", false, FlxG.width, FlxG.height);
+			backgroundTile.scrollFactor.y = 0.8;
+			background.add(backgroundTile);
+			
+			i++;
+		}
 	}
 	
 	/**
