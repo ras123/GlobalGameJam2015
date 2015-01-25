@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.util.FlxRandom;
 import flixel.util.FlxAngle;
+import haxe.Constraints.FlatEnum;
 
 import Math;
 
@@ -24,7 +25,10 @@ class Asteroid extends FlxSprite
 	{
 		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
 		var spawnPosX:Int = spawnOnLeft ? 0 - SIZE : FlxG.width;
-		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height);
+		
+		// Y spawn position depends on where the player is, so add the camera
+		// coordinates.
+		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height + FlxG.camera.scroll.y);
 		super(spawnPosX, spawnPosY);
 		
 		// Three asteroid graphics. Load randomly.
