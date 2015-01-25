@@ -66,17 +66,7 @@ class PlayState extends FlxState
 		spawnAsteroids();
 		
 		if (FlxG.overlap(playerShip, asteroids)) {
-			var shipMidpoint : FlxPoint = playerShip.getMidpoint();
-			var explosion : Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
-			add(explosion);
-			
-			playerShip.kill();
-			FlxG.camera.shake(0.01, 0.5);
-			
-			// Calculate death camera movement specs.
-			deathCamDelta = new FlxPoint();
-			deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
-			deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
+			destroyTheShip();
 		}
 		
 		if (!playerShip.alive) {
@@ -98,6 +88,20 @@ class PlayState extends FlxState
 			
 		}
 		
+	}
+	
+	private function destroyTheShip():Void {
+		var shipMidpoint : FlxPoint = playerShip.getMidpoint();
+		var explosion : Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
+		add(explosion);
+		
+		playerShip.kill();
+		FlxG.camera.shake(0.01, 0.5);
+		
+		// Calculate death camera movement specs.
+		deathCamDelta = new FlxPoint();
+		deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
+		deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
 	}
 	
 	private function restartGame():Void {
