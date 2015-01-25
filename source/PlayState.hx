@@ -26,6 +26,8 @@ class PlayState extends FlxState
 	public static var BGTILE_VERTICAL_LENGTHS: Int = 960;
 	public static var BG_VERTICAL_TILES: Int = 16;
 	
+	private var captainOne:FlxSprite;
+	private var captainTwo:FlxSprite;
 	private var hud: FlxSprite;
 	
 	private var background:FlxGroup;
@@ -67,11 +69,6 @@ class PlayState extends FlxState
 	override public function create():Void
 	{
 		FlxG.mouse.visible = false;
-
-		hud = new FlxSprite(0, 0);
-		hud.loadGraphic("assets/images/hud.png", false, 768, 1152);
-		hud.scrollFactor.set(0, 0);
-		add(hud);
 		
 		background = new FlxGroup();
 		setupBackground();
@@ -147,6 +144,14 @@ class PlayState extends FlxState
 		
 		//createBlackHole();
 		
+		createCaptains();
+		
+		
+		hud = new FlxSprite(0, 0);
+		hud.loadGraphic("assets/images/hud.png", false, 768, 1152);
+		hud.scrollFactor.set(0, 0);
+		add(hud);
+		
 		heightMeter = new FlxText(60, 60, 250, "Height: " + (FlxG.worldBounds.bottom - min_y)  + "m");
 		heightMeter.size = 20;
 		heightMeter.scrollFactor.x = heightMeter.scrollFactor.y = 0;
@@ -160,6 +165,19 @@ class PlayState extends FlxState
 		//add(debugtext2);
 		
 		super.create();
+	}
+	
+	private function createCaptains():Void {
+		// Hack to to get the captains in the ship, since their animations
+		// are triggered by the ship's controls. I know it's slopppy, but
+		// they have to be controlled in there, and they have to be added out
+		// here, so just do it this way for now.
+		captainOne = new FlxSprite(16, FlxG.height - 320);
+		captainTwo = new FlxSprite(FlxG.width - 16 - 250, FlxG.height - 320);
+		playerShip.addCaptains(captainOne, captainTwo);
+		
+		add(captainOne);
+		add(captainTwo);
 	}
 	
 	/**
@@ -287,7 +305,7 @@ class PlayState extends FlxState
 	}
 	
 	private function updateHeightCounter():Void {
-		heightMeter.text = "Height: " + (FlxG.worldBounds.bottom - min_y) + "m";
+		heightMeter.text = "Height: " + Std.int(FlxG.worldBounds.bottom - min_y) + "m";
 	}
 	
 	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {

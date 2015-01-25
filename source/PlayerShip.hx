@@ -31,6 +31,9 @@ class PlayerShip extends FlxSprite
 	private var blackHole: FlxSprite;
 	private var blackHoleVisible: Bool = false;	
 	
+	private var captainOne:FlxSprite;
+	private var captainTwo:FlxSprite;
+	
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
 		super(X, Y);
@@ -50,6 +53,20 @@ class PlayerShip extends FlxSprite
 		this.animation.add("l_booster", [7, 8], 8, true);
 		this.animation.add("f_booster", [12, 13], 8, true);
 		this.animation.add("breaking_apart", [10, 11], 1, false);
+	}
+	
+	public function addCaptains(captainOne:FlxSprite, captainTwo:FlxSprite):Void {
+		this.captainOne = captainOne;
+		captainOne.loadGraphic("assets/images/captsheet.png", true, 250, 300);
+		captainOne.animation.add("idle", [0, 1], 4, true);
+		captainOne.animation.add("active", [2, 3], 4, true);
+		captainOne.scrollFactor.set(0, 0);
+		
+		this.captainTwo = captainTwo;
+		captainTwo.loadGraphic("assets/images/captsheet.png", true, 250, 300);
+		captainTwo.animation.add("idle", [4, 5], 4, true);
+		captainTwo.animation.add("active", [6, 7], 4, true);
+		captainTwo.scrollFactor.set(0, 0);
 	}
 	
 	override public function update():Void
@@ -79,6 +96,21 @@ class PlayerShip extends FlxSprite
 		else
 			this.animation.play("idle");
 		
+			
+		// Captain one animations.
+		if (l_booster_on) {
+			captainOne.animation.play("active");
+		}
+		else {
+			captainOne.animation.play("idle");
+		}
+		// Captain two animations.
+		if (r_booster_on) {
+			captainTwo.animation.play("active");
+		}
+		else {
+			captainTwo.animation.play("idle");
+		}
 		
 		//this.acceleration.set(0, 0);
 		//// Four states. Each one is a permutation of whether player 1 and 2 have
