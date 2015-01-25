@@ -29,6 +29,7 @@ class PlayState extends FlxState
 	private var captainOne:FlxSprite;
 	private var captainTwo:FlxSprite;
 	private var hud: FlxSprite;
+	private var statsOverlay:StatsOverlay;
 	
 	private var background:FlxGroup;
 	private var boundaries: FlxGroup;
@@ -53,8 +54,8 @@ class PlayState extends FlxState
 
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
-	
-	private static var deathCamFrames = 10;
+	private var deathCamZoomComplete:Bool = false;
+	private static var deathCamFrames = 20;
 	private var deathZoomInRate:Float = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 	private var deathCamDelta:FlxPoint;
 
@@ -219,11 +220,25 @@ class PlayState extends FlxState
 			}
 			
 			// Dramatic zoom!
-			if (FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
+			if (!deathCamZoomComplete && FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
 				FlxG.camera.zoom += deathZoomInRate;				
 			
 				FlxG.camera.x += deathCamDelta.x;
 				FlxG.camera.y += deathCamDelta.y;
+				
+				// If the zoom is done, bring up the stats info and reverse
+				// the zoom.
+				if (FlxG.camera.zoom >= CAMERA_MAX_ZOOM) {
+					deathCamZoomComplete = true;
+					statsOverlay = new StatsOverlay(getMaxHeight());
+					add(statsOverlay);
+				}
+			}
+			else if (deathCamZoomComplete && FlxG.camera.zoom > CAMERA_STANDARD_ZOOM) {
+				FlxG.camera.zoom -= deathZoomInRate / 2;				
+			
+				FlxG.camera.x -= deathCamDelta.x / 2;
+				FlxG.camera.y -= deathCamDelta.y / 2;
 			}
 		}
 	}
@@ -305,11 +320,7 @@ class PlayState extends FlxState
 	}
 	
 	private function updateHeightCounter():Void {
-		// I just sloppily copy pasted this from above where the ship gets 
-		// created, and then tweaked it to fit a little better.
-		var initialShipPosY:Float = FlxG.worldBounds.bottom - (16 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT;
-		var maxShipHeight:Float = Math.max(0, initialShipPosY - min_y);
-		heightMeter.text = "Height: " + Std.int(maxShipHeight) + "m";
+		heightMeter.text = "Height: " + getMaxHeight() + "m";
 	}
 	
 	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
@@ -334,6 +345,18 @@ class PlayState extends FlxState
 		deathCamDelta = new FlxPoint();
 		deathCamDelta.x = (FlxG.camera.scroll.x - shipMidpoint.x) / deathCamFrames;
 		deathCamDelta.y = (FlxG.camera.scroll.y - shipMidpoint.y) / deathCamFrames;
+	}
+	
+	private function getMaxHeight():Int {
+		// I just sloppily copy pasted this from above where the ship gets 
+		// created, and then tweaked it to fit a little better.
+		var initialShipPosY:Float = FlxG.worldBounds.bottom - (16 + 100) - PlayerShip.PLAYER_SPRITE_HEIGHT;
+		var maxShipHeight:Float = Math.max(0, initialShipPosY - min_y);
+		return Std.int(maxShipHeight);
+	}
+	
+	private function displayStatsOverlay():Void {
+		
 	}
 	
 	private function restartGame():Void {
