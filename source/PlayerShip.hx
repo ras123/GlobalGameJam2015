@@ -10,8 +10,8 @@ import flixel.util.FlxPoint;
  */
 class PlayerShip extends FlxSprite
 {
-	private static var PLAYER_ONE_CONTROLS : Array<String> = ["A", "SPACE"];
-	private static var PLAYER_TWO_CONTROLS : Array<String> = ["D", "L"];
+	private static var PLAYER_ONE_CONTROLS : Array<String> = ["ENTER", "A", "SPACE"];
+	private static var PLAYER_TWO_CONTROLS : Array<String> = ["CAPSLOCK", "D", "L"];
 	private static var DOWN_CONTROLS : Array<String> = ["S"];
 	
 	private static var SHIP_MAX_VELOCITY : FlxPoint = new FlxPoint(150, 150);
