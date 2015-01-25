@@ -2,6 +2,7 @@ package ;
 
 import flixel.FlxG;
 import flixel.FlxSprite;
+import flixel.util.FlxAngle;
 import flixel.util.FlxPoint;
 
 /**
@@ -10,74 +11,105 @@ import flixel.util.FlxPoint;
  */
 class PlayerShip extends FlxSprite
 {
-	private static var PLAYER_ONE_CONTROLS : Array<String> = ["ENTER", "A", "SPACE"];
-	private static var PLAYER_TWO_CONTROLS : Array<String> = ["CAPSLOCK", "D", "L"];
-	private static var DOWN_CONTROLS : Array<String> = ["S"];
+	public var accelerating: Bool = false;
 	
-	private static var SHIP_MAX_VELOCITY : FlxPoint = new FlxPoint(150, 150);
-	private static var SHIP_ACCELERATION_RATE : FlxPoint = new FlxPoint(4, 4);
-	private static var SHIP_DECELLERATION_RATE : FlxPoint = new FlxPoint(SHIP_MAX_VELOCITY.x * 2, SHIP_MAX_VELOCITY.y * 2);
+	private static var PLAYER_ONE_CONTROLS: Array<String> = ["ENTER"];//, "A", "SPACE"];
+	private static var PLAYER_TWO_CONTROLS: Array<String> = ["CAPSLOCK"];//, "D", "L"];
+	//private static var DOWN_CONTROLS: Array<String> = ["S"];
+
+	private static var r_booster_acc: FlxPoint = new FlxPoint(-4, 10);
+	private static var r_booster_angular_acc: Int = -45;
+	private static var l_booster_acc: FlxPoint = new FlxPoint(4, 10);
+	private static var l_booster_angular_acc: Int = 45;
+	
+	//private static var SHIP_MAX_VELOCITY: FlxPoint = new FlxPoint(150, 150);
+	//private static var SHIP_ACCELERATION_RATE: FlxPoint = new FlxPoint(4, 4);
+	//private static var SHIP_DECELLERATION_RATE: FlxPoint = new FlxPoint(SHIP_MAX_VELOCITY.x * 2, SHIP_MAX_VELOCITY.y * 2);
 	private static var EVENT_HORIZON = 150;
 	
-	private var blackHole : FlxSprite;
-	private var blackHoleVisible : Bool = false;
-	
-	public var accelerating : Bool;
+	private var blackHole: FlxSprite;
+	private var blackHoleVisible: Bool = false;	
 	
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
 		super(X, Y);
+
+		maxVelocity = new FlxPoint(200, 1600);
+		drag = new FlxPoint(100, 400);
+		maxAngular = 90;
+		angularDrag = 90;
+		acceleration = new FlxPoint(0, 400);
 		
-		maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
-		drag.set(SHIP_DECELLERATION_RATE.x, SHIP_DECELLERATION_RATE.y);
+		//maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
+		//drag.set(SHIP_DECELLERATION_RATE.x, SHIP_DECELLERATION_RATE.y);
 		
 		this.loadGraphic("assets/images/100spritesheet.png", true, 100, 100);
 		this.animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], 10, true);
-		this.animation.add("boost_left", [5, 6], 8, true);
-		this.animation.add("boost_right", [7, 8], 8, true);
+		this.animation.add("r_booster", [5, 6], 8, true);
+		this.animation.add("l_booster", [7, 8], 8, true);
+		this.animation.add("f_booster", [12, 13], 8, true);
 		this.animation.add("breaking_apart", [10, 11], 1, false);
-		this.animation.add("boost_forward", [12, 13], 8, true);
-
-		accelerating = false;
 	}
 	
 	override public function update():Void
 	{
 		super.update();
 		
-		var playerOneButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
-		var playerTwoButtonIsPressed:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
-
-		if (playerOneButtonIsPressed || playerTwoButtonIsPressed)
-			accelerating = true;
+		var r_booster_on:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
+		var l_booster_on:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
+		accelerating = true;
 		
-		this.acceleration.set(0, 0);
-		// Four states. Each one is a permutation of whether player 1 and 2 have
-		// their button pressed.
-		if (playerOneButtonIsPressed && playerTwoButtonIsPressed) {
-			this.acceleration.y = -this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
-			this.animation.play("boost_forward");
+		if (r_booster_on && l_booster_on)
+		{
+			velocity.addPoint(FlxAngle.rotatePoint(0, r_booster_acc.y + l_booster_acc.y, 0, 0, angle));
+			this.animation.play("f_booster");
 		}
-		else if (!playerOneButtonIsPressed && playerTwoButtonIsPressed) {
-			this.acceleration.x = -this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-			this.animation.play("boost_left");
+		else if (r_booster_on)
+		{
+			angularVelocity += r_booster_angular_acc;
+			velocity.addPoint(FlxAngle.rotatePoint(r_booster_acc.x, r_booster_acc.y, 0, 0, angle));
+			this.animation.play("r_booster");
 		}
-		else if (playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
-			this.acceleration.x = this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
-			this.animation.play("boost_right");
+		else if (l_booster_on)
+		{
+			angularVelocity += l_booster_angular_acc;
+			velocity.addPoint(FlxAngle.rotatePoint(l_booster_acc.x, l_booster_acc.y, 0, 0, angle));
+			this.animation.play("l_booster");
 		}
-		else if (FlxG.keys.anyPressed(["S"])) {
-			this.acceleration.y = this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
+		else
+		{
 			this.animation.play("idle");
+			accelerating = false;
 		}
-		else if (!playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
-			//this.acceleration.y = this.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
-			//this.acceleration.x = 0;
-			this.animation.play("idle");
-		}
-		else {
-			// Should never happen.
-		}
+		
+		
+		//this.acceleration.set(0, 0);
+		//// Four states. Each one is a permutation of whether player 1 and 2 have
+		//// their button pressed.
+		//if (r_booster_on && l_booster_on) {
+			//this.acceleration.y = -this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
+			//this.animation.play("f_booster");
+		//}
+		//else if (!r_booster_on && l_booster_on) {
+			//this.acceleration.x = -this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
+			//this.animation.play("r_booster");
+		//}
+		//else if (r_booster_on && !l_booster_on) {
+			//this.acceleration.x = this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
+			//this.animation.play("l_booster");
+		//}
+		//else if (FlxG.keys.anyPressed(["S"])) {
+			//this.acceleration.y = this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
+			//this.animation.play("idle");
+		//}
+		//else if (!r_booster_on && !l_booster_on) {
+			////this.acceleration.y = this.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
+			////this.acceleration.x = 0;
+			//this.animation.play("idle");
+		//}
+		//else {
+			//// Should never happen.
+		//}
 		
 		if (blackHoleVisible) {
 			var x = blackHole.getMidpoint().x - getMidpoint().x;
@@ -113,7 +145,7 @@ class PlayerShip extends FlxSprite
 		//trace("Velocity: " + velocity.x + " " + velocity.y);
 		//trace("Acceleration: " + acceleration.x + " " + acceleration.y);
 		
-		this.angle = 30 * (velocity.x / maxVelocity.x);
+		//this.angle = 30 * (velocity.x / maxVelocity.x);
 	}
 	
 	public function setBlackHole(blackHole : FlxSprite):Void {

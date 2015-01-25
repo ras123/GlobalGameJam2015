@@ -214,7 +214,7 @@ class PlayState extends FlxState
 
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 40; // Chance per frame.
+		var asteroidSpawnRate:Float = 1 / 200; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
