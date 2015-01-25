@@ -15,6 +15,8 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
 import flixel.util.FlxRect;
 import flixel.util.FlxSpriteUtil;
+import flixel.util.FlxTimer;
+import BlackHole;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -40,6 +42,7 @@ class PlayState extends FlxState
 
 	private var hazards: FlxGroup;
 	private var asteroids: FlxGroup;
+	private var mines: FlxGroup;
 
 	private static var LAVA_ACTIVE = false;
 	private static var LAVA_CLIMB_RATE = 2;
@@ -65,6 +68,9 @@ class PlayState extends FlxState
 	private var debugtext2: FlxText;
 	
 	private var heightMeter: FlxText;
+	
+	private var mine:Mine;
+	private static var MINE_TRIGGER_FIELD = 200;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -141,14 +147,17 @@ class PlayState extends FlxState
 
 		add(hazards);
 		
+		mines = new FlxGroup();
+		hazards.add(mines);
+		
 		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
 		//FlxG.camera.deadzone.top = FlxG.height / 2;
 		//FlxG.camera.deadzone.bottom = FlxG.height;
 		//climbonly_deadzone = FlxG.camera.deadzone;
+
 		//climbcamera_on = true;
-			
-		createCaptains();
 		
+		createCaptains();
 		
 		hud = new FlxSprite(0, 0);
 		hud.loadGraphic("assets/images/hud.png", false, 768, 1152);
@@ -203,11 +212,14 @@ class PlayState extends FlxState
 		
 		manageCamera(playerShip.velocity.y < 0);
 		
-		spawnAsteroids();
+		//spawnAsteroids();
+		
+		spawnMines();
 		
 		//FlxG.overlap(playerShip, hazards, doPrecisionOverlap);
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
+		FlxG.overlap(playerShip, mines, activateMine);
 		FlxG.overlap(playerShip, blackholes, activateGravity, processPreciseOverlap);
 		FlxG.collide(playerShip, safespots, dockTheShip);
 		
@@ -228,6 +240,29 @@ class PlayState extends FlxState
 			
 				FlxG.camera.x += deathCamDelta.x;
 				FlxG.camera.y += deathCamDelta.y;
+			}
+		}
+		
+		if (playerShip.alive) {
+			var allMines = mines.members;
+			var i = 0;
+			for (i in 0...mines.length) {
+				var mine = cast(allMines[i], Mine);
+				var mineLocation = mine.getMidpoint();
+				var playerShipLocation = playerShip.getMidpoint();
+				if (playerShipLocation.distanceTo(mineLocation) < MINE_TRIGGER_FIELD &&
+					!mine.isBeeping()) {
+					mine.startBeeping();
+				} else if (playerShipLocation.distanceTo(mineLocation) > MINE_TRIGGER_FIELD &&
+						   mine.isBeeping()) {
+					mine.stopBeeping();
+				} else if (mine.exploded) {
+					var mineMidpoint:FlxPoint = mine.getMidpoint();
+					var explosion:Explosion = new Explosion(mineMidpoint.x, mineMidpoint.y);
+					add(explosion);
+					new FlxTimer(0.2, mineExploded);
+					mine.kill();
+				}	
 			}
 		}
 	}
@@ -326,7 +361,7 @@ class PlayState extends FlxState
 		return FlxG.pixelPerfectOverlap(sprite1, sprite2);
 	}
 	
-	private function destroyTheShip(ship:FlxSprite, object:FlxSprite):Void {
+	private function destroyTheShip(ship:FlxSprite, ?object:FlxSprite):Void {
 		var shipMidpoint:FlxPoint = ship.getMidpoint();
 		var explosion:Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
 		add(explosion);
@@ -364,13 +399,16 @@ class PlayState extends FlxState
 		asteroids.add(asteroid);
 		
 	}
-
-	//public function createBlackHole():Void {
-		//var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
-		//blackHole.makeGraphic(48, 48, FlxColor.RED);
-		//playerShip.setBlackHole(blackHole);
-		//add(blackHole);
-	//}
+	
+	public function spawnMines():Void {
+		var mineSpawnRate:Float = 1 / 800; // Chance per frame.
+		if (FlxRandom.float() > mineSpawnRate) {
+			return;
+		}
+		
+		var mine:Mine = new Mine();
+		mines.add(mine);
+	}
 
 	private function spawnBlackHoles():Void
 	{
@@ -390,4 +428,13 @@ class PlayState extends FlxState
 			cast (blackhole, BlackHole).attract(ship);
 	}
 	
+	private function activateMine(ship:FlxSprite, mine:FlxSprite):Void {
+		if (Std.is(mine, Mine))
+			cast (mine, Mine).startBeeping();
+	}
+	
+	private function mineExploded(timer:FlxTimer):Void
+	{
+		destroyTheShip(playerShip);
+	}
 }
