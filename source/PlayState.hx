@@ -227,9 +227,9 @@ class PlayState extends FlxState
 		
 		manageCamera(playerShip.velocity.y < 0);
 		
-		//spawnAsteroids();
+		spawnAsteroids();
 		
-		//spawnMines();
+		spawnMines();
 		
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
