@@ -28,10 +28,12 @@ class PlayState extends FlxState
 	
 	private var hud: FlxSprite;
 	
-	private var background:FlxGroup;
+	private var background: FlxGroup;
 	private var boundaries: FlxGroup;
 	private var safespots: FlxGroup;
-	private var playerShip:PlayerShip;
+	private var launchpad: FlxSprite;
+	private var target: FlxSprite;
+	private var playerShip: PlayerShip;
 
 	private var hazards: FlxGroup;
 	private var asteroids: FlxGroup;
@@ -45,9 +47,9 @@ class PlayState extends FlxState
 	private var blackholes: FlxGroup;
 	private var blackholecores: FlxGroup;
 	
-	private var climbcamera_on:Bool;
-	private var min_y:Float;
-	private var climbonly_deadzone:FlxRect;
+	private var min_y: Float;
+	//private var climbcamera_on: Bool;
+	//private var climbonly_deadzone: FlxRect;
 
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
@@ -56,10 +58,10 @@ class PlayState extends FlxState
 	private var deathZoomInRate:Float = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 	private var deathCamDelta:FlxPoint;
 
-	private var debugtext1:FlxText;
-	private var debugtext2:FlxText;
+	private var debugtext1: FlxText;
+	private var debugtext2: FlxText;
 	
-	private var heightMeter:FlxText;
+	private var heightMeter: FlxText;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -119,12 +121,12 @@ class PlayState extends FlxState
 		}
 		
 		safespots = new FlxGroup();
-		var launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
+		launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
 		launchpad.makeGraphic(120, 16, 0xcc44ff00);
 		launchpad.immovable = true;
 		safespots.add(launchpad);
 		
-		var target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
+		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
 		target.makeGraphic(160, 24, FlxColor.SILVER);
 		target.immovable = true;
 		safespots.add(target);
@@ -143,7 +145,7 @@ class PlayState extends FlxState
 		//FlxG.camera.deadzone.top = FlxG.height / 2;
 		//FlxG.camera.deadzone.bottom = FlxG.height;
 		//climbonly_deadzone = FlxG.camera.deadzone;
-		climbcamera_on = true;
+		//climbcamera_on = true;
 		
 		//createBlackHole();
 		
@@ -187,7 +189,7 @@ class PlayState extends FlxState
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
 		FlxG.overlap(playerShip, blackholes, activateGravity, processPreciseOverlap);
-		FlxG.collide(playerShip, safespots);
+		FlxG.collide(playerShip, safespots, dockTheShip);
 		
 		updateHeightCounter();
 		
@@ -257,32 +259,32 @@ class PlayState extends FlxState
 	private function manageCamera(climbing: Bool):Void
 	{		
 		// update min_y
-		if (climbcamera_on && playerShip.y < min_y)
+		if (climbing && playerShip.y < min_y)
 			min_y = playerShip.y;
 		
 		// reenable camera follow if playerShip reaches threshhold
-		if (climbing && playerShip.y < min_y && !climbcamera_on)
-		{
-			FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
-			FlxG.camera.deadzone = climbonly_deadzone;
-			climbcamera_on = true;
-		}
-				
-		// disable camera follow if playerShip falls off screen bottom
-		if (!climbing && climbcamera_on && playerShip.y > min_y + (FlxG.height / 2 - playerShip.frameHeight))
-		{
-			//FlxG.camera.follow(null);
-			//climbcamera_on = false;
-		}
-
-		// update horizontal camera position manually if follow disabled
-		if (!climbcamera_on)
-		{
-			if (playerShip.x - FlxG.camera.scroll.x < climbonly_deadzone.left)
-				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - climbonly_deadzone.left;
-			else if (playerShip.x - FlxG.camera.scroll.x > (climbonly_deadzone.right - playerShip.frameWidth/2))
-				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - (climbonly_deadzone.right - playerShip.frameWidth/2);
-		}
+		//if (climbing && playerShip.y < min_y && !climbcamera_on)
+		//{
+			//FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
+			//FlxG.camera.deadzone = climbonly_deadzone;
+			//climbcamera_on = true;
+		//}
+				//
+		//// disable camera follow if playerShip falls off screen bottom
+		//if (!climbing && climbcamera_on && playerShip.y > min_y + (FlxG.height / 2 - playerShip.frameHeight))
+		//{
+			////FlxG.camera.follow(null);
+			////climbcamera_on = false;
+		//}
+//
+		//// update horizontal camera position manually if follow disabled
+		//if (!climbcamera_on)
+		//{
+			//if (playerShip.x - FlxG.camera.scroll.x < climbonly_deadzone.left)
+				//FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - climbonly_deadzone.left;
+			//else if (playerShip.x - FlxG.camera.scroll.x > (climbonly_deadzone.right - playerShip.frameWidth/2))
+				//FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - (climbonly_deadzone.right - playerShip.frameWidth/2);
+		//}
 
 	}
 	
@@ -312,6 +314,10 @@ class PlayState extends FlxState
 		deathCamDelta = new FlxPoint();
 		deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
 		deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
+	}
+
+	private function dockTheShip(ship:FlxSprite, object:FlxSprite):Void {
+		
 	}
 	
 	private function restartGame():Void {
