@@ -1,5 +1,6 @@
 package;
 
+import BlackHole;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.FlxState;
@@ -135,7 +136,7 @@ class PlayState extends FlxState
 		
 		blackholes = new FlxGroup();
 		blackholecores = new FlxGroup();
-		spawnBlackHoles(blackholes, blackholecores);
+		spawnBlackHoles();
 		hazards.add(blackholecores);
 
 		add(hazards);
@@ -159,12 +160,12 @@ class PlayState extends FlxState
 		heightMeter.scrollFactor.x = heightMeter.scrollFactor.y = 0;
 		add(heightMeter);
 		
-		debugtext1 = new FlxText(0, 0, 400, "player pos: " + playerShip.x + ", " + playerShip.y);
+		debugtext1 = new FlxText(0, 0, 800, "player pos: " + Std.int(playerShip.x) + ", " + Std.int(playerShip.y), 20);
 		debugtext1.scrollFactor.set(0, 0);
-		debugtext2 = new FlxText(0, 12, 400, "world bounds: " + FlxG.worldBounds.top + ", " + FlxG.worldBounds.bottom);
+		debugtext2 = new FlxText(0, 20, 800, "world bounds: " + FlxG.worldBounds.top + ", " + FlxG.worldBounds.bottom, 20);
 		debugtext2.scrollFactor.set(0, 0);
-		//add(debugtext1);
-		//add(debugtext2);
+		add(debugtext1);
+		add(debugtext2);
 		
 		super.create();
 	}
@@ -197,7 +198,8 @@ class PlayState extends FlxState
 		super.update();
 
 		debugtext1.text = Std.string("player pos: " + playerShip.x + ", " + playerShip.y);
-		//debugtext2.text = Std.string("screen pos: " + FlxG.camera.scroll.x + ", " + FlxG.camera.scroll.y);
+		var bhtemp:FlxSprite = cast(blackholes.getFirstExisting(), FlxSprite);
+		debugtext2.text = Std.string("bhole pos: " + bhtemp.x + ", " + bhtemp.y);
 		
 		manageCamera(playerShip.velocity.y < 0);
 		
@@ -352,7 +354,7 @@ class PlayState extends FlxState
 
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 10; // Chance per frame.
+		var asteroidSpawnRate:Float = 0 / 40; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
@@ -370,16 +372,16 @@ class PlayState extends FlxState
 		//add(blackHole);
 	//}
 
-	private function spawnBlackHoles(bh_group:FlxGroup, bhc_group:FlxGroup):Void
+	private function spawnBlackHoles():Void
 	{
-		var blackhole_m = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 5, BGTILE_VERTICAL_LENGTHS * 7, Size.Medium);
-		bh_group.add(blackhole_m);
+		//var blackhole_m = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 5, BGTILE_VERTICAL_LENGTHS * 7, Size.Medium);
+		//blackholes.add(blackhole_m);
 
-		var blackhole_s = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 9, BGTILE_VERTICAL_LENGTHS * 11, Size.Small);
-		bh_group.add(blackhole_s);
+		//var blackhole_s = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 9, BGTILE_VERTICAL_LENGTHS * 11, Size.Small);
+		//blackholes.add(blackhole_s);
 		
-		var blackhole_b = new BlackHole(FlxG.worldBounds.width, BGTILE_VERTICAL_LENGTHS * 13, BGTILE_VERTICAL_LENGTHS * 15, Size.Big);
-		bh_group.add(blackhole_b);
+		var blackhole_b = new BlackHole(Std.int(FlxG.worldBounds.width/2), BGTILE_VERTICAL_LENGTHS * 14, BGTILE_VERTICAL_LENGTHS * 14, Size.Big);
+		blackholes.add(blackhole_b);
 	}
 	
 	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void

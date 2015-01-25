@@ -19,30 +19,35 @@ enum Size {
  
  class BlackHole extends FlxSprite
 {	
-	private static var SIZE_SMALL = 540;
-	private static var SIZE_MEDIUM = 720;
-	private static var SIZE_BIG = 960;
-	private static var ATTRACTION_FACTOR = 1;
+	private static var SIZE_SMALL = 600;
+	private static var SIZE_MEDIUM = 750;
+	private static var SIZE_BIG = 1000;
+	private static var ATTRACTION_FACTOR = 0.1;
 
-	private var attraction:Int;
+	private var attraction:Float;
 		
 	public function new(map_width:Int, min_y:Int, max_y:Int, size:EnumValue)
 	{
 		var spawn_x = Std.int(map_width * FlxRandom.floatRanged(0.3, 0.7));
 		var spawn_y = FlxRandom.intRanged(min_y, max_y);		
 		super(spawn_x, spawn_y);
-
-		immovable = true;
-		solid = false;
+		
+		//immovable = true;
+		//solid = false;
 
 		switch (size) {
 			case Size.Small:
 				attraction = ATTRACTION_FACTOR * SIZE_SMALL;
+				this.loadGraphic("assets/images/bholesmall.png", true, SIZE_SMALL, SIZE_SMALL);
 			case Size.Medium:
 				attraction = ATTRACTION_FACTOR * SIZE_MEDIUM;
+				this.loadGraphic("assets/images/bholemed.png", true, SIZE_MEDIUM, SIZE_MEDIUM);
 			case Size.Big:
 				attraction = ATTRACTION_FACTOR * SIZE_BIG;
+				this.loadGraphic("assets/images/bigblackhole.png", true, SIZE_BIG, SIZE_BIG);
 		}
+		
+			this.animation.add("idle", [0, 1], true);
 	}
 	
 	public function attract(object:FlxSprite):Void
