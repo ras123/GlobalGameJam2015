@@ -15,6 +15,8 @@ class Mine extends FlxSprite
 
 	private var beeping:Bool = false;
 	public var exploded:Bool = false;
+	private var slowBeepingTimer:FlxTimer;
+	private var fastBeepingTimer:FlxTimer;
 	private var timer:FlxTimer;
 	private static var TIME_TO_EXPLOSION = 3;
 	private static var SIZE:Int = 100;
@@ -44,18 +46,27 @@ class Mine extends FlxSprite
 		}
 	}
 	
+	private function beepingSound(timer:FlxTimer):Void
+	{
+		FlxG.sound.play("assets/sounds/beep.wav");
+	}
+	
 	public function startBeeping():Void
 	{
 		animation.add("beeping", [30, 31], 2, true);
-		new FlxTimer(2, fastBeeping);
+		slowBeepingTimer = new FlxTimer(1, beepingSound, 2);
+		fastBeepingTimer = new FlxTimer(2, fastBeeping);
 		timer = new FlxTimer(TIME_TO_EXPLOSION, explode);
 		beeping = true;
+		FlxG.sound.play("assets/sounds/beep.wav");
 	}
 	
 	public function stopBeeping():Void
 	{
 		beeping = false;
 		timer.cancel();
+		slowBeepingTimer.cancel();
+		fastBeepingTimer.cancel();
 	}
 	
 	public function isBeeping():Bool
@@ -66,6 +77,7 @@ class Mine extends FlxSprite
 	private function fastBeeping(timer:FlxTimer):Void
 	{
 		animation.add("beeping", [30, 31], 8, true);
+		new FlxTimer(.25, beepingSound, 4);
 	}
 	
 	private function explode(timer:FlxTimer):Void
