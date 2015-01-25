@@ -38,7 +38,7 @@ class PlayState extends FlxState
 	private var boundaries: FlxGroup;
 	private var safespots: FlxGroup;
 	private var launchpad: FlxSprite;
-	private var target: FlxSprite;
+	private var targetArea: FlxSprite;
 	private var playerShip: PlayerShip;
 
 	private var hazards: FlxGroup;
@@ -92,7 +92,7 @@ class PlayState extends FlxState
 
 		boundaries = new FlxGroup();
 		var floor = new FlxSprite(FlxG.worldBounds.left, FlxG.worldBounds.bottom - 100);
-		floor.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.BROWN);
+		floor.loadGraphic("assets/images/ground.png", false, 1920, 50);
 		floor.allowCollisions = FlxObject.CEILING;
 		boundaries.add(floor);
 
@@ -115,7 +115,8 @@ class PlayState extends FlxState
 		boundaries.add(r_wall2);
 		
 		var ceiling = new FlxSprite(FlxG.worldBounds.left, FlxG.worldBounds.top);
-		ceiling.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.CHARCOAL);
+		//ceiling.makeGraphic(Std.int(FlxG.worldBounds.width), 100, FlxColor.CHARCOAL);
+		ceiling.loadGraphic("assets/images/ceiling.png", false, 1920, 50);
 		ceiling.allowCollisions = FlxObject.FLOOR;
 		boundaries.add(ceiling);
 		add(boundaries);
@@ -128,14 +129,20 @@ class PlayState extends FlxState
 		
 		safespots = new FlxGroup();
 		launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
-		launchpad.makeGraphic(120, 16, 0xcc44ff00);
+		launchpad.loadGraphic("assets/images/100spritesheet.png", false, 100, 50);
+		launchpad.animation.add("idle", [96], 12, true);
+		launchpad.animation.play("idle");
+		//launchpad.makeGraphic(120, 16, 0xcc44ff00);
 		launchpad.immovable = true;
 		safespots.add(launchpad);
 		
-		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
-		target.makeGraphic(160, 24, FlxColor.SILVER);
-		target.immovable = true;
-		safespots.add(target);
+		targetArea = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top);
+		targetArea.loadGraphic("assets/images/100spritesheet.png", false, 100, 100);
+		targetArea.animation.add("idle", [44], 12, true);
+		targetArea.animation.play("idle");
+		//target.makeGraphic(160, 24, FlxColor.SILVER);
+		targetArea.immovable = true;
+		safespots.add(targetArea);
 		add(safespots);
 		
 		hazards = new FlxGroup();
@@ -200,7 +207,7 @@ class PlayState extends FlxState
 		add(captainOne);
 		add(captainTwo);
 	}
-	
+
 	/**
 	 * Function that is called once every frame.
 	 */
@@ -227,8 +234,10 @@ class PlayState extends FlxState
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
 		FlxG.overlap(playerShip, mines, activateMine);
+
 		//FlxG.overlap(playerShip, blackholes, activateGravity);
 		FlxG.overlap(playerShip, blackholes, destroyTheShip, processPreciseOverlap);
+		FlxG.collide(playerShip, targetArea, displayVictoryScreen);
 		FlxG.collide(playerShip, safespots, dockTheShip);
 		
 		updateHeightCounter();
@@ -253,7 +262,7 @@ class PlayState extends FlxState
 				// the zoom.
 				if (FlxG.camera.zoom >= CAMERA_MAX_ZOOM) {
 					deathCamZoomComplete = true;
-					statsOverlay = new StatsOverlay(getMaxHeight());
+					statsOverlay = new StatsOverlay(getMaxHeight(), false);
 					add(statsOverlay);
 				}
 			}
@@ -288,6 +297,13 @@ class PlayState extends FlxState
 			}
 		}
 	}
+	
+	private function displayVictoryScreen(sprite1:FlxSprite, sprite2:FlxSprite):Void {
+		//playerShip.destroy();
+		statsOverlay = new StatsOverlay(getMaxHeight(), true);
+		add(statsOverlay);
+	}
+	
 	
 	/**
 	 * Function that is called when this state is destroyed - you might want to 
@@ -368,12 +384,6 @@ class PlayState extends FlxState
 	private function updateHeightCounter():Void {
 		heightMeter.text = "Height: " + getMaxHeight() + "m";
 	}
-	
-	//private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
-		//if (FlxG.pixelPerfectOverlap(sprite1, sprite2)) {
-			//destroyTheShip();
-		//}
-	//}
 
 	private function processPreciseOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Bool {
 		return FlxG.pixelPerfectOverlap(sprite1, sprite2);
