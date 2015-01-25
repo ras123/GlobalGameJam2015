@@ -10,7 +10,7 @@ import flixel.util.FlxMath;
 import flixel.util.FlxColor;
 import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
-import openfl._v2.geom.Point;
+import flixel.util.FlxSpriteUtil;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -18,7 +18,6 @@ import openfl._v2.geom.Point;
 class PlayState extends FlxState
 {	
 	private var playerShip:PlayerShip;
-	
 	private var asteroids:FlxGroup;
 	
 	/**
@@ -30,12 +29,13 @@ class PlayState extends FlxState
 		
 		FlxG.mouse.visible = false;
 		
-		//playerShip = new FlxSprite(FlxG.width / 2, FlxG.height / 2);
 		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
 		add(playerShip);
 		
 		asteroids = new FlxGroup();
 		add(asteroids);
+		
+		createBlackHole();
 	}
 	
 	/**
@@ -54,7 +54,7 @@ class PlayState extends FlxState
 	{
 		super.update();
 		
-		spawnAsteroids();
+		//spawnAsteroids();
 		
 		FlxG.collide(playerShip, asteroids);
 	}
@@ -94,5 +94,12 @@ class PlayState extends FlxState
 		
 		asteroids.add(asteroid);
 		
+	}
+	
+	public function createBlackHole():Void {
+		var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
+		blackHole.makeGraphic(48, 48, FlxColor.RED);
+		playerShip.setBlackHole(blackHole);
+		add(blackHole);
 	}
 }
