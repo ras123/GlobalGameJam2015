@@ -20,6 +20,13 @@ class PlayState extends FlxState
 	private var playerShip:PlayerShip;
 	private var asteroids:FlxGroup;
 	
+	private static var CAMERA_STANDARD_ZOOM = 1;
+	private static var CAMERA_MAX_ZOOM = 2;
+	
+	private var deathCamFrames = 30;
+	private var deathZoomInRate:Float;
+	private var deathCamDelta:FlxPoint;
+	
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -28,6 +35,8 @@ class PlayState extends FlxState
 		super.create();
 		
 		FlxG.mouse.visible = false;
+		
+		deathZoomInRate = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 		
 		playerShip = new PlayerShip(FlxG.width / 2, FlxG.height / 2);
 		add(playerShip);
@@ -62,7 +71,12 @@ class PlayState extends FlxState
 			add(explosion);
 			
 			playerShip.kill();
+			FlxG.camera.shake(0.01, 0.5);
 			
+			// Calculate death camera movement specs.
+			deathCamDelta = new FlxPoint();
+			deathCamDelta.x = (FlxG.camera.x - shipMidpoint.x) / deathCamFrames;
+			deathCamDelta.y = (FlxG.camera.y - shipMidpoint.y) / deathCamFrames;
 		}
 		
 		if (!playerShip.alive) {
@@ -73,9 +87,17 @@ class PlayState extends FlxState
 			else if (FlxG.keys.anyPressed(["ESCAPE", "M"])) {
 				FlxG.cameras.fade(0xff000000, 1, false, goToMainMenu);
 			}
+			
+			// Dramatic zoom!
+			if (FlxG.camera.zoom < CAMERA_MAX_ZOOM) {
+				FlxG.camera.zoom += deathZoomInRate;				
+			
+				FlxG.camera.x += deathCamDelta.x;
+				FlxG.camera.y += deathCamDelta.y;
+			}
+			
 		}
 		
-		//FlxG.collide(playerShip, asteroids);
 	}
 	
 	private function restartGame():Void {
