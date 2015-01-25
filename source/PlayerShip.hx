@@ -151,8 +151,8 @@ class PlayerShip extends FlxSprite
 			
 			// If close enough to the black hole, start feeling the gravitational pull
 			if (Math.abs(x) < EVENT_HORIZON * 1.2 && Math.abs(y) < EVENT_HORIZON * 1.2) {
-				var gravityPullX = 400 / (Math.sqrt(Math.abs(x)));
-				var gravityPullY = 400 / (Math.sqrt(Math.abs(y)));
+				var gravityPullX = 4000 / (Math.sqrt(Math.abs(x)));
+				var gravityPullY = 4000 / (Math.sqrt(Math.abs(y)));
 				var C = 0.8;
 				
 				// If near even horizon, make controlling the ship more difficult
