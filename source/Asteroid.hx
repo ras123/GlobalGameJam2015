@@ -24,11 +24,15 @@ class Asteroid extends FlxSprite
 	public function new() 
 	{
 		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
-		var spawnPosX:Int = spawnOnLeft ? 0 - SIZE : FlxG.width;
+		var rightSpawnLocation:Float = FlxG.camera.scroll.x + FlxG.width;
+		var spawnPosX:Float = spawnOnLeft ? FlxG.camera.scroll.x - SIZE : rightSpawnLocation;
 		
 		// Y spawn position depends on where the player is, so add the camera
 		// coordinates.
-		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height + FlxG.camera.scroll.y);
+		var screenWidthsToSpawnOn:Int = 5;
+		var minSpawnPosY:Float = FlxG.camera.scroll.y - screenWidthsToSpawnOn*FlxG.height;
+		var maxSpawnPosY:Float = minSpawnPosY + 2*screenWidthsToSpawnOn*FlxG.height;
+		var spawnPosY:Float = (maxSpawnPosY - minSpawnPosY) * FlxRandom.float() + minSpawnPosY;
 		super(spawnPosX, spawnPosY);
 		
 		// Three asteroid graphics. Load randomly.
