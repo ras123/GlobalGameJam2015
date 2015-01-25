@@ -11,15 +11,16 @@ import flixel.util.FlxPoint;
  */
 class PlayerShip extends FlxSprite
 {
-	public var accelerating: Bool = false;
+	public static var PLAYER_SPRITE_WIDTH: Int = 100;
+	public static var PLAYER_SPRITE_HEIGHT: Int = 100;
 	
 	private static var PLAYER_ONE_CONTROLS: Array<String> = ["ENTER"];//, "A", "SPACE"];
 	private static var PLAYER_TWO_CONTROLS: Array<String> = ["CAPSLOCK"];//, "D", "L"];
 	//private static var DOWN_CONTROLS: Array<String> = ["S"];
 
-	private static var r_booster_acc: FlxPoint = new FlxPoint(-4, 10);
+	private static var r_booster_acc: FlxPoint = new FlxPoint(-4, 6);
 	private static var r_booster_angular_acc: Int = -45;
-	private static var l_booster_acc: FlxPoint = new FlxPoint(4, 10);
+	private static var l_booster_acc: FlxPoint = new FlxPoint(4, 6);
 	private static var l_booster_angular_acc: Int = 45;
 	
 	//private static var SHIP_MAX_VELOCITY: FlxPoint = new FlxPoint(150, 150);
@@ -34,7 +35,7 @@ class PlayerShip extends FlxSprite
 	{
 		super(X, Y);
 
-		maxVelocity = new FlxPoint(200, 1600);
+		maxVelocity = new FlxPoint(200, 2000);
 		drag = new FlxPoint(100, 400);
 		maxAngular = 90;
 		angularDrag = 90;
@@ -43,7 +44,7 @@ class PlayerShip extends FlxSprite
 		//maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
 		//drag.set(SHIP_DECELLERATION_RATE.x, SHIP_DECELLERATION_RATE.y);
 		
-		this.loadGraphic("assets/images/100spritesheet.png", true, 100, 100);
+		this.loadGraphic("assets/images/100spritesheet.png", true, PLAYER_SPRITE_WIDTH, PLAYER_SPRITE_HEIGHT);
 		this.animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], 10, true);
 		this.animation.add("r_booster", [5, 6], 8, true);
 		this.animation.add("l_booster", [7, 8], 8, true);
@@ -57,7 +58,6 @@ class PlayerShip extends FlxSprite
 		
 		var r_booster_on:Bool = FlxG.keys.anyPressed(PLAYER_ONE_CONTROLS);
 		var l_booster_on:Bool = FlxG.keys.anyPressed(PLAYER_TWO_CONTROLS);
-		accelerating = true;
 		
 		if (r_booster_on && l_booster_on)
 		{
@@ -77,10 +77,7 @@ class PlayerShip extends FlxSprite
 			this.animation.play("l_booster");
 		}
 		else
-		{
 			this.animation.play("idle");
-			accelerating = false;
-		}
 		
 		
 		//this.acceleration.set(0, 0);

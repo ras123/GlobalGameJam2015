@@ -14,8 +14,8 @@ import Math;
  */
 class Asteroid extends FlxSprite
 {
-	private static var MIN_SPEED:Int = 30;
-	private static var MAX_SPEED:Int = 60;
+	private static var MIN_SPEED:Int = 60;
+	private static var MAX_SPEED:Int = 100;
 	private static var SIZE:Int = 100;
 	private static var MAX_ROTATION_RATE = 5;
 	
