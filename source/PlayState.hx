@@ -144,15 +144,15 @@ class PlayState extends FlxState
 		
 		blackholes = new FlxGroup();
 		blackholecores = new FlxGroup();
-		blackhole = new BlackHole(700, 13000, Size.Medium);
-		blackholes.add(blackhole);
+
+		//blackhole = new BlackHole(700, 13000, Size.Medium);
+		//blackholes.add(blackhole);
+
+		spawnBlackHoles();
+
 		add(blackholes);
 		hazards.add(blackholecores);
 		
-		//blackhole = new FlxSprite(700, 13000);
-		//blackhole.loadGraphic("assets/images/bigblackhole.png", true, 1000, 1000);
-		//hazards.add(blackhole);
-		//spawnBlackHoles();
 
 		add(hazards);
 		
@@ -215,8 +215,8 @@ class PlayState extends FlxState
 			
 		super.update();
 
-		debugtext1.text = Std.string("player pos: " + Std.int(playerShip.x) + ", " + Std.int(playerShip.y));
-		debugtext2.text = Std.string("blackhole pos: " + blackhole.x + ", " + blackhole.y);
+		//debugtext1.text = Std.string("player pos: " + Std.int(playerShip.x) + ", " + Std.int(playerShip.y));
+		//debugtext2.text = Std.string("blackhole pos: " + blackhole.x + ", " + blackhole.y);
 		
 		manageCamera(playerShip.velocity.y < 0);
 		
@@ -227,7 +227,8 @@ class PlayState extends FlxState
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
 		FlxG.overlap(playerShip, mines, activateMine);
-		FlxG.overlap(playerShip, blackholes, activateGravity);
+		//FlxG.overlap(playerShip, blackholes, activateGravity);
+		FlxG.overlap(playerShip, blackholes, destroyTheShip, processPreciseOverlap);
 		FlxG.collide(playerShip, safespots, dockTheShip);
 		
 		updateHeightCounter();
@@ -442,20 +443,21 @@ class PlayState extends FlxState
 
 	private function spawnBlackHoles():Void
 	{
-		//var blackhole_m = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 5, BGTILE_VERTICAL_LENGTHS * 7, Size.Medium);
-		//blackholes.add(blackhole_m);
+		var blackhole_m = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 13, BGTILE_VERTICAL_LENGTHS * 11, Size.Medium);
+		blackholes.add(blackhole_m);
 
-		//var blackhole_s = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 9, BGTILE_VERTICAL_LENGTHS * 11, Size.Small);
-		//blackholes.add(blackhole_s);
+		var blackhole_s = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 8, BGTILE_VERTICAL_LENGTHS * 6, Size.Small);
+		blackholes.add(blackhole_s);
 		
-		//var blackhole_b = new BlackHole(Std.int(FlxG.worldBounds.width/2), BGTILE_VERTICAL_LENGTHS * 14, BGTILE_VERTICAL_LENGTHS * 14, Size.Big);
-		//blackholes.add(blackhole_b);
+		var blackhole_b = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 3, BGTILE_VERTICAL_LENGTHS * 1, Size.Big);
+		blackholes.add(blackhole_b);
 	}
 	
 	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void
 	{
 		if (Std.is(blackhole, BlackHole))
-			cast (blackhole, BlackHole).attract(ship);
+			//cast (blackhole, BlackHole).attract(ship);
+			playerShip.setBlackHole(blackhole);
 	}
 	
 	private function activateMine(ship:FlxSprite, mine:FlxSprite):Void {
