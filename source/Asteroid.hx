@@ -24,8 +24,13 @@ class Asteroid extends FlxSprite
 	public function new() 
 	{
 		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
-		var rightSpawnLocation:Float = FlxG.camera.scroll.x + FlxG.width;
-		var spawnPosX:Float = spawnOnLeft ? FlxG.camera.scroll.x - SIZE : rightSpawnLocation;
+		//var rightSpawnLocation:Float = FlxG.camera.scroll.x + FlxG.width;
+		//var spawnPosX:Float = spawnOnLeft ? FlxG.camera.scroll.x - SIZE : rightSpawnLocation;
+		var spawnPosX:Float;
+		if (spawnOnLeft)
+			spawnPosX = FlxG.worldBounds.left;
+		else
+			spawnPosX = FlxG.worldBounds.right;
 		
 		// Y spawn position depends on where the player is, so add the camera
 		// coordinates.
