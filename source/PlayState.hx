@@ -105,9 +105,7 @@ class PlayState extends FlxState
 		
 		spawnAsteroids();
 		
-		if (FlxG.overlap(playerShip, asteroids)) {
-			destroyTheShip();
-		}
+		FlxG.overlap(playerShip, asteroids, doPrecisionOverlap);
 		
 		if (!playerShip.alive) {
 			// Allow players to restart the game or go back to the menu.
@@ -128,6 +126,12 @@ class PlayState extends FlxState
 			
 		}
 		
+	}
+	
+	private function doPrecisionOverlap(sprite1:FlxSprite, sprite2:FlxSprite):Void {
+		if (FlxG.pixelPerfectOverlap(sprite1, sprite2)) {
+			destroyTheShip();
+		}
 	}
 	
 	private function destroyTheShip():Void {

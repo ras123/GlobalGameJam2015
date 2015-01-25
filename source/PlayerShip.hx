@@ -34,7 +34,8 @@ class PlayerShip extends FlxSprite
 		this.animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], 10, true);
 		this.animation.add("boost_left", [5, 6], 8, true);
 		this.animation.add("boost_right", [7, 8], 8, true);
-		this.animation.add("breaking_up", [10, 11], 1, false);		
+		this.animation.add("breaking_apart", [10, 11], 1, false);
+		this.animation.add("boost_forward", [12, 13], 8, true);
 	}
 	
 	override public function update():Void
@@ -49,13 +50,13 @@ class PlayerShip extends FlxSprite
 		// their button pressed.
 		if (playerOneButtonIsPressed && playerTwoButtonIsPressed) {
 			this.acceleration.y = -this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
-			this.animation.play("idle"); // TODO: need a boost-forward animation
+			this.animation.play("boost_forward");
 		}
-		else if (playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
+		else if (!playerOneButtonIsPressed && playerTwoButtonIsPressed) {
 			this.acceleration.x = -this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
 			this.animation.play("boost_left");
 		}
-		else if (!playerOneButtonIsPressed && playerTwoButtonIsPressed) {
+		else if (playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
 			this.acceleration.x = this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
 			this.animation.play("boost_right");
 		}
