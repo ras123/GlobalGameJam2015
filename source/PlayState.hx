@@ -35,7 +35,7 @@ class PlayState extends FlxState
 		asteroids = new FlxGroup();
 		add(asteroids);
 		
-		createBlackHole();
+		//createBlackHole();
 	}
 	
 	/**
@@ -54,41 +54,44 @@ class PlayState extends FlxState
 	{
 		super.update();
 		
-		//spawnAsteroids();
+		spawnAsteroids();
 		
-		FlxG.collide(playerShip, asteroids);
+		if (FlxG.overlap(playerShip, asteroids)) {
+			var shipMidpoint : FlxPoint = playerShip.getMidpoint();
+			var explosion : Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
+			add(explosion);
+			
+			playerShip.kill();
+			
+		}
+		
+		if (!playerShip.alive) {
+			// Allow players to restart the game or go back to the menu.
+			if (FlxG.keys.anyPressed(["SPACE", "R"])) {
+				FlxG.cameras.fade(0xff000000, 1, false, restartGame);
+			}
+			else if (FlxG.keys.anyPressed(["ESCAPE", "M"])) {
+				FlxG.cameras.fade(0xff000000, 1, false, goToMainMenu);
+			}
+		}
+		
+		//FlxG.collide(playerShip, asteroids);
+	}
+	
+	private function restartGame():Void {
+		FlxG.switchState(new PlayState());
+	}
+	
+	private function goToMainMenu():Void {
+		FlxG.switchState(new MenuState());
 	}
 	
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 20;
+		var asteroidSpawnRate:Float = 1 / 40; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
-		
-		/*
-		var asteroidSize = 12;
-		
-		var spawnOnLeft:Bool = FlxRandom.float() > 1 / 2;
-		var spawnPosX:Int = spawnOnLeft ? 0 : FlxG.width - asteroidSize;
-		var spawnPosY:Int = Std.int(FlxRandom.float() * FlxG.height);
-		var asteroid:Asteroid = new Asteroid(spawnPosX, spawnPosY);
-		asteroid.makeGraphic(asteroidSize, asteroidSize, FlxColor.RED);
-		
-		// Give it some speed.
-		var minAsteroidSpeed = 100;
-		var maxAsteroidSpeed = 200;
-		asteroid.velocity.x = (maxAsteroidSpeed - minAsteroidSpeed) * 
-			FlxRandom.float() + minAsteroidSpeed;
-		
-		// Reverse speed if it's starting on the right side of the screen.
-		if (!spawnOnLeft) {
-			asteroid.velocity.x *= -1;
-		}
-		
-		// Now give it some horizontal speed.
-		asteroid.velocity.y = maxAsteroidSpeed * (FlxRandom.float() - 0.5);
-		*/
 		
 		var asteroid:Asteroid = new Asteroid();
 		
