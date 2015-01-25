@@ -14,6 +14,8 @@ import flixel.util.FlxPoint;
 import flixel.util.FlxRandom;
 import flixel.util.FlxRect;
 import flixel.util.FlxSpriteUtil;
+import flixel.util.FlxTimer;
+import BlackHole;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -31,13 +33,16 @@ class PlayState extends FlxState
 	private var hud: FlxSprite;
 	private var statsOverlay:StatsOverlay;
 	
-	private var background:FlxGroup;
+	private var background: FlxGroup;
 	private var boundaries: FlxGroup;
 	private var safespots: FlxGroup;
-	private var playerShip:PlayerShip;
+	private var launchpad: FlxSprite;
+	private var target: FlxSprite;
+	private var playerShip: PlayerShip;
 
 	private var hazards: FlxGroup;
 	private var asteroids: FlxGroup;
+	private var mines: FlxGroup;
 
 	private static var LAVA_ACTIVE = false;
 	private static var LAVA_CLIMB_RATE = 2;
@@ -48,9 +53,9 @@ class PlayState extends FlxState
 	private var blackholes: FlxGroup;
 	private var blackholecores: FlxGroup;
 	
-	private var climbcamera_on:Bool;
-	private var min_y:Float;
-	private var climbonly_deadzone:FlxRect;
+	private var min_y: Float;
+	//private var climbcamera_on: Bool;
+	//private var climbonly_deadzone: FlxRect;
 
 	private static var CAMERA_STANDARD_ZOOM = 1;
 	private static var CAMERA_MAX_ZOOM = 2;
@@ -59,10 +64,13 @@ class PlayState extends FlxState
 	private var deathZoomInRate:Float = (CAMERA_MAX_ZOOM - CAMERA_STANDARD_ZOOM) / deathCamFrames;
 	private var deathCamDelta:FlxPoint;
 
-	private var debugtext1:FlxText;
-	private var debugtext2:FlxText;
+	private var debugtext1: FlxText;
+	private var debugtext2: FlxText;
 	
-	private var heightMeter:FlxText;
+	private var heightMeter: FlxText;
+	
+	private var mine:Mine;
+	private static var MINE_TRIGGER_FIELD = 200;
 	
 	/**
 	 * Function that is called up when to state is created to set it up. 
@@ -117,12 +125,12 @@ class PlayState extends FlxState
 		}
 		
 		safespots = new FlxGroup();
-		var launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
+		launchpad = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 60, Std.int(FlxG.worldBounds.bottom) - (16 + 100));
 		launchpad.makeGraphic(120, 16, 0xcc44ff00);
 		launchpad.immovable = true;
 		safespots.add(launchpad);
 		
-		var target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
+		target = new FlxSprite(FlxG.worldBounds.left + FlxG.worldBounds.width / 2 - 80, FlxG.worldBounds.top + 100);
 		target.makeGraphic(160, 24, FlxColor.SILVER);
 		target.immovable = true;
 		safespots.add(target);
@@ -134,19 +142,22 @@ class PlayState extends FlxState
 		
 		blackholes = new FlxGroup();
 		blackholecores = new FlxGroup();
+		spawnBlackHoles(blackholes, blackholecores);
 		hazards.add(blackholecores);
+
 		add(hazards);
+		
+		mines = new FlxGroup();
+		hazards.add(mines);
 		
 		FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
 		//FlxG.camera.deadzone.top = FlxG.height / 2;
 		//FlxG.camera.deadzone.bottom = FlxG.height;
 		//climbonly_deadzone = FlxG.camera.deadzone;
-		climbcamera_on = true;
-		
-		//createBlackHole();
+
+		//climbcamera_on = true;
 		
 		createCaptains();
-		
 		
 		hud = new FlxSprite(0, 0);
 		hud.loadGraphic("assets/images/hud.png", false, 768, 1152);
@@ -200,13 +211,16 @@ class PlayState extends FlxState
 		
 		manageCamera(playerShip.velocity.y < 0);
 		
-		spawnAsteroids();
+		//spawnAsteroids();
+		
+		spawnMines();
 		
 		//FlxG.overlap(playerShip, hazards, doPrecisionOverlap);
 		FlxG.overlap(playerShip, boundaries, destroyTheShip);
 		FlxG.overlap(playerShip, hazards, destroyTheShip, processPreciseOverlap);
+		FlxG.overlap(playerShip, mines, activateMine);
 		FlxG.overlap(playerShip, blackholes, activateGravity, processPreciseOverlap);
-		FlxG.collide(playerShip, safespots);
+		FlxG.collide(playerShip, safespots, dockTheShip);
 		
 		updateHeightCounter();
 		
@@ -239,6 +253,29 @@ class PlayState extends FlxState
 			
 				FlxG.camera.x -= deathCamDelta.x / 2;
 				FlxG.camera.y -= deathCamDelta.y / 2;
+			}
+		}
+		
+		if (playerShip.alive) {
+			var allMines = mines.members;
+			var i = 0;
+			for (i in 0...mines.length) {
+				var mine = cast(allMines[i], Mine);
+				var mineLocation = mine.getMidpoint();
+				var playerShipLocation = playerShip.getMidpoint();
+				if (playerShipLocation.distanceTo(mineLocation) < MINE_TRIGGER_FIELD &&
+					!mine.isBeeping()) {
+					mine.startBeeping();
+				} else if (playerShipLocation.distanceTo(mineLocation) > MINE_TRIGGER_FIELD &&
+						   mine.isBeeping()) {
+					mine.stopBeeping();
+				} else if (mine.exploded) {
+					var mineMidpoint:FlxPoint = mine.getMidpoint();
+					var explosion:Explosion = new Explosion(mineMidpoint.x, mineMidpoint.y);
+					add(explosion);
+					new FlxTimer(0.2, mineExploded);
+					mine.kill();
+				}	
 			}
 		}
 	}
@@ -290,32 +327,32 @@ class PlayState extends FlxState
 	private function manageCamera(climbing: Bool):Void
 	{		
 		// update min_y
-		if (climbcamera_on && playerShip.y < min_y)
+		if (climbing && playerShip.y < min_y)
 			min_y = playerShip.y;
 		
 		// reenable camera follow if playerShip reaches threshhold
-		if (climbing && playerShip.y < min_y && !climbcamera_on)
-		{
-			FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
-			FlxG.camera.deadzone = climbonly_deadzone;
-			climbcamera_on = true;
-		}
-				
-		// disable camera follow if playerShip falls off screen bottom
-		if (!climbing && climbcamera_on && playerShip.y > min_y + (FlxG.height / 2 - playerShip.frameHeight))
-		{
-			//FlxG.camera.follow(null);
-			//climbcamera_on = false;
-		}
-
-		// update horizontal camera position manually if follow disabled
-		if (!climbcamera_on)
-		{
-			if (playerShip.x - FlxG.camera.scroll.x < climbonly_deadzone.left)
-				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - climbonly_deadzone.left;
-			else if (playerShip.x - FlxG.camera.scroll.x > (climbonly_deadzone.right - playerShip.frameWidth/2))
-				FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - (climbonly_deadzone.right - playerShip.frameWidth/2);
-		}
+		//if (climbing && playerShip.y < min_y && !climbcamera_on)
+		//{
+			//FlxG.camera.follow(playerShip, FlxCamera.STYLE_TOPDOWN_TIGHT);
+			//FlxG.camera.deadzone = climbonly_deadzone;
+			//climbcamera_on = true;
+		//}
+				//
+		//// disable camera follow if playerShip falls off screen bottom
+		//if (!climbing && climbcamera_on && playerShip.y > min_y + (FlxG.height / 2 - playerShip.frameHeight))
+		//{
+			////FlxG.camera.follow(null);
+			////climbcamera_on = false;
+		//}
+//
+		//// update horizontal camera position manually if follow disabled
+		//if (!climbcamera_on)
+		//{
+			//if (playerShip.x - FlxG.camera.scroll.x < climbonly_deadzone.left)
+				//FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - climbonly_deadzone.left;
+			//else if (playerShip.x - FlxG.camera.scroll.x > (climbonly_deadzone.right - playerShip.frameWidth/2))
+				//FlxG.camera.scroll.x += (playerShip.x - FlxG.camera.scroll.x) - (climbonly_deadzone.right - playerShip.frameWidth/2);
+		//}
 
 	}
 	
@@ -333,7 +370,7 @@ class PlayState extends FlxState
 		return FlxG.pixelPerfectOverlap(sprite1, sprite2);
 	}
 	
-	private function destroyTheShip(ship:FlxSprite, object:FlxSprite):Void {
+	private function destroyTheShip(ship:FlxSprite, ?object:FlxSprite):Void {
 		var shipMidpoint:FlxPoint = ship.getMidpoint();
 		var explosion:Explosion = new Explosion(shipMidpoint.x, shipMidpoint.y);
 		add(explosion);
@@ -345,6 +382,10 @@ class PlayState extends FlxState
 		deathCamDelta = new FlxPoint();
 		deathCamDelta.x = (FlxG.camera.scroll.x - shipMidpoint.x) / deathCamFrames;
 		deathCamDelta.y = (FlxG.camera.scroll.y - shipMidpoint.y) / deathCamFrames;
+	}
+
+	private function dockTheShip(ship:FlxSprite, object:FlxSprite):Void {
+		
 	}
 	
 	private function getMaxHeight():Int {
@@ -379,17 +420,42 @@ class PlayState extends FlxState
 		asteroids.add(asteroid);
 		
 	}
-
-	public function createBlackHole():Void {
-		var blackHole = new FlxSprite(FlxG.width / 4, FlxG.height / 4);
-		blackHole.makeGraphic(48, 48, FlxColor.RED);
-		playerShip.setBlackHole(blackHole);
-		add(blackHole);
+	
+	public function spawnMines():Void {
+		var mineSpawnRate:Float = 1 / 800; // Chance per frame.
+		if (FlxRandom.float() > mineSpawnRate) {
+			return;
+		}
+		
+		var mine:Mine = new Mine();
+		mines.add(mine);
 	}
 
-	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void {
+	private function spawnBlackHoles(bh_group:FlxGroup, bhc_group:FlxGroup):Void
+	{
+		var blackhole_m = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 5, BGTILE_VERTICAL_LENGTHS * 7, Size.Medium);
+		bh_group.add(blackhole_m);
+
+		var blackhole_s = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 9, BGTILE_VERTICAL_LENGTHS * 11, Size.Small);
+		bh_group.add(blackhole_s);
+		
+		var blackhole_b = new BlackHole(Std.int(FlxG.worldBounds.width), BGTILE_VERTICAL_LENGTHS * 13, BGTILE_VERTICAL_LENGTHS * 15, Size.Big);
+		bh_group.add(blackhole_b);
+	}
+	
+	private function activateGravity(ship:FlxSprite, blackhole:FlxSprite):Void
+	{
 		if (Std.is(blackhole, BlackHole))
 			cast (blackhole, BlackHole).attract(ship);
 	}
 	
+	private function activateMine(ship:FlxSprite, mine:FlxSprite):Void {
+		if (Std.is(mine, Mine))
+			cast (mine, Mine).startBeeping();
+	}
+	
+	private function mineExploded(timer:FlxTimer):Void
+	{
+		destroyTheShip(playerShip);
+	}
 }
