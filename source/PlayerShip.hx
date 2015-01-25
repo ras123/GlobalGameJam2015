@@ -22,13 +22,19 @@ class PlayerShip extends FlxSprite
 	private var blackHole : FlxSprite;
 	private var blackHoleVisible : Bool = false;
 	
+	
 	public function new(X:Float=0, Y:Float=0, ?SimpleGraphic:Dynamic) 
 	{
 		super(X, Y);
 		
-		loadGraphic("assets/images/shipsprite.png");
 		maxVelocity.set(SHIP_MAX_VELOCITY.x, SHIP_MAX_VELOCITY.y);
 		drag.set(SHIP_DECELLERATION_RATE.x, SHIP_DECELLERATION_RATE.y);
+		
+		this.loadGraphic("assets/images/100spritesheet.png", true, 100, 100);
+		this.animation.add("idle", [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4], 10, true);
+		this.animation.add("boost_left", [5, 6], 8, true);
+		this.animation.add("boost_right", [7, 8], 8, true);
+		this.animation.add("breaking_up", [10, 11], 1, false);		
 	}
 	
 	override public function update():Void
@@ -43,19 +49,24 @@ class PlayerShip extends FlxSprite
 		// their button pressed.
 		if (playerOneButtonIsPressed && playerTwoButtonIsPressed) {
 			this.acceleration.y = -this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
+			this.animation.play("idle"); // TODO: need a boost-forward animation
 		}
 		else if (playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
 			this.acceleration.x = -this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
+			this.animation.play("boost_left");
 		}
 		else if (!playerOneButtonIsPressed && playerTwoButtonIsPressed) {
 			this.acceleration.x = this.maxVelocity.x * SHIP_ACCELERATION_RATE.x;
+			this.animation.play("boost_right");
 		}
 		else if (FlxG.keys.anyPressed(["S"])) {
 			this.acceleration.y = this.maxVelocity.y * SHIP_ACCELERATION_RATE.y;
+			this.animation.play("idle");
 		}
 		else if (!playerOneButtonIsPressed && !playerTwoButtonIsPressed) {
 			//this.acceleration.y = this.maxVelocity.y * SHIP_DECELLERATION_RATE.y;
 			//this.acceleration.x = 0;
+			this.animation.play("idle");
 		}
 		else {
 			// Should never happen.
