@@ -189,8 +189,8 @@ class PlayState extends FlxState
 		debugtext1.scrollFactor.set(0, 0);
 		debugtext2 = new FlxText(0, 20, 800, "world bounds: " + FlxG.worldBounds.top + ", " + FlxG.worldBounds.bottom, 20);
 		debugtext2.scrollFactor.set(0, 0);
-		add(debugtext1);
-		add(debugtext2);
+		//add(debugtext1);
+		//add(debugtext2);
 		
 		super.create();
 	}
@@ -430,7 +430,7 @@ class PlayState extends FlxState
 
 	public function spawnAsteroids():Void {
 		
-		var asteroidSpawnRate:Float = 1 / 60; // Chance per frame.
+		var asteroidSpawnRate:Float = 1 / 20; // Chance per frame.
 		if (FlxRandom.float() > asteroidSpawnRate) {
 			return;
 		}
